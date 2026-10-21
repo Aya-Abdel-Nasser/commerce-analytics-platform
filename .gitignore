@@ -33,3 +33,4 @@ Thumbs.db
 !.env.*.example
 data/generated/
 data/landing/
+/docs/validation/reports/UTC_REPAIR_ROLLBACK_*.sql
