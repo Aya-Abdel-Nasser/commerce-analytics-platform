@@ -1,0 +1,13 @@
+{
+  "project": "Commerce Analytics Engineering Platform",
+  "snapshot": "prodlike initial (2026-10)",
+  "warehouse": "commerce_warehouse_dev",
+  "expected_grand_total": 3405213,
+  "sources": {
+    "postgresql_oltp": {"orders":200000,"order_items":500000,"customers":50000,"products":3000,"payments":215000},
+    "mysql_crm": {"crm_customers":50000,"crm_loyalty_accounts":35000,"crm_loyalty_transactions":175000,"crm_campaigns":120,"crm_campaign_memberships":360000,"crm_support_tickets":45000},
+    "partner_shipping_csv": {"total":120000,"files":4},
+    "returns_api": {"total":22093,"files":1},
+    "application_events": {"total":1630000,"files":9,"late_arriving_24h_plus":11897}
+  }
+}

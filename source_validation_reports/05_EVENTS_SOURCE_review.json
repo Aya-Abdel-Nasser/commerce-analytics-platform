@@ -1,0 +1,184 @@
+{
+  "input_folder": "/tmp/commerce_review/data/landing/events/prodlike/initial",
+  "source_manifest": "manifest.json",
+  "manifest_expected_total": 1630000,
+  "actual_total_lines": 1630000,
+  "per_file": [
+    {
+      "file": "part-00001.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 384,
+      "max_json_line_utf8_bytes": 384,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00002.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 384,
+      "max_json_line_utf8_bytes": 384,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00003.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 384,
+      "max_json_line_utf8_bytes": 384,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00004.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 384,
+      "max_json_line_utf8_bytes": 384,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00005.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 384,
+      "max_json_line_utf8_bytes": 384,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00006.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 384,
+      "max_json_line_utf8_bytes": 384,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00007.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 384,
+      "max_json_line_utf8_bytes": 384,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00008.jsonl",
+      "expected_rows": 200000,
+      "actual_rows": 200000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 372,
+      "max_json_line_utf8_bytes": 372,
+      "records_containing_pipe_character": 0
+    },
+    {
+      "file": "part-00009.jsonl",
+      "expected_rows": 30000,
+      "actual_rows": 30000,
+      "match": true,
+      "invalid_json_lines": 0,
+      "max_json_line_characters": 372,
+      "max_json_line_utf8_bytes": 372,
+      "records_containing_pipe_character": 0
+    }
+  ],
+  "event_type_counts": {
+    "added_to_cart": 230000,
+    "checkout_cancelled": 20000,
+    "checkout_started": 200000,
+    "order_submitted": 200000,
+    "payment_submitted": 140000,
+    "product_viewed": 350000,
+    "purchase_completed": 140000,
+    "session_started": 350000
+  },
+  "source_system_counts": {
+    "COMMERCE_MOBILE_APP": 813145,
+    "COMMERCE_WEB_APP": 816855
+  },
+  "late_arriving_24h_or_more": 11897,
+  "invalid_json_lines": 0,
+  "invalid_utc_date_records": 0,
+  "max_json_line_characters": 384,
+  "max_json_line_utf8_bytes": 384,
+  "records_containing_pipe_character": 0,
+  "missing_required_fields_records": 0,
+  "duplicate_event_ids": 0,
+  "invalid_event_ids": 0,
+  "distinct_expected_range_event_ids": 1630000,
+  "top_level_field_types": {
+    "_batch": {
+      "string": 1630000
+    },
+    "_source_system": {
+      "string": 1630000
+    },
+    "payload": {
+      "object": 1630000
+    }
+  },
+  "payload_field_types": {
+    "anonymous_id": {
+      "null": 1547500,
+      "string": 82500
+    },
+    "channel": {
+      "string": 1630000
+    },
+    "customer_code": {
+      "string": 1547500,
+      "null": 82500
+    },
+    "event_id": {
+      "string": 1630000
+    },
+    "event_name": {
+      "string": 1630000
+    },
+    "event_time_utc": {
+      "string": 1630000
+    },
+    "order_number": {
+      "null": 1130000,
+      "string": 500000
+    },
+    "product_sku": {
+      "null": 350000,
+      "string": 1280000
+    },
+    "received_at_utc": {
+      "string": 1630000
+    },
+    "session_id": {
+      "string": 1630000
+    }
+  },
+  "checks": {
+    "all_files_present": true,
+    "rows_match_manifest_per_file": true,
+    "rows_match_manifest_total": true,
+    "event_types_match_manifest": true,
+    "late_events_match_manifest": true,
+    "all_lines_valid_json_objects": true,
+    "required_fields_present": true,
+    "ids_unique_and_in_expected_range": true,
+    "timestamps_valid_utc": true,
+    "pipe_delimiter_safe_for_current_informatica_mapping": true
+  },
+  "all_checks_passed": true,
+  "error_examples": [],
+  "note": "Profile is based on real files. Manifest alone does not prove their contents."
+}

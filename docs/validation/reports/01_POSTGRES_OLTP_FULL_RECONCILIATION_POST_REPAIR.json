@@ -1,0 +1,154 @@
+{
+  "report_type": "full_keyed_source_to_target_comparison",
+  "executed_at_utc": "2026-10-19T18:07:37.489366+00:00",
+  "scope": "PostgreSQL OLTP initial snapshot",
+  "pg_host": "127.0.0.1",
+  "pg_port": 15432,
+  "pg_database": "commerce_oltp_dev",
+  "sqlserver_database": "commerce_warehouse_dev",
+  "source_timezone": "UTC",
+  "sqlserver_datetime2_timezone_assumption": "UTC wall-clock",
+  "raw_customer_values_logged": false,
+  "table_results": [
+    {
+      "expected_rows": 50000,
+      "source_rows": 50000,
+      "target_rows": 50000,
+      "matched_primary_keys": 50000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "status": "PASS",
+      "source_table": "commerce.customers",
+      "target_table": "bronze.oltp_customers",
+      "primary_key": [
+        "customer_id"
+      ],
+      "compared_source_columns": [
+        "customer_id",
+        "customer_code",
+        "full_name",
+        "email",
+        "city",
+        "created_at",
+        "updated_at"
+      ],
+      "excluded_lineage_columns": [
+        "_ingested_at_utc"
+      ]
+    },
+    {
+      "expected_rows": 500000,
+      "source_rows": 500000,
+      "target_rows": 500000,
+      "matched_primary_keys": 500000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "status": "PASS",
+      "source_table": "commerce.order_items",
+      "target_table": "bronze.oltp_order_items",
+      "primary_key": [
+        "order_item_id"
+      ],
+      "compared_source_columns": [
+        "order_item_id",
+        "order_id",
+        "product_id",
+        "quantity",
+        "unit_price_egp",
+        "discount_amount_egp"
+      ],
+      "excluded_lineage_columns": [
+        "_ingested_at_utc"
+      ]
+    },
+    {
+      "expected_rows": 200000,
+      "source_rows": 200000,
+      "target_rows": 200000,
+      "matched_primary_keys": 200000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "status": "PASS",
+      "source_table": "commerce.orders",
+      "target_table": "bronze.oltp_orders",
+      "primary_key": [
+        "order_id"
+      ],
+      "compared_source_columns": [
+        "order_id",
+        "order_number",
+        "customer_id",
+        "order_status",
+        "sales_channel",
+        "order_date",
+        "updated_at"
+      ],
+      "excluded_lineage_columns": [
+        "_ingested_at_utc"
+      ]
+    },
+    {
+      "expected_rows": 215000,
+      "source_rows": 215000,
+      "target_rows": 215000,
+      "matched_primary_keys": 215000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "status": "PASS",
+      "source_table": "commerce.payments",
+      "target_table": "bronze.oltp_payments",
+      "primary_key": [
+        "payment_id"
+      ],
+      "compared_source_columns": [
+        "payment_id",
+        "transaction_id",
+        "order_id",
+        "payment_method",
+        "payment_status",
+        "amount_egp",
+        "payment_date"
+      ],
+      "excluded_lineage_columns": [
+        "_ingested_at_utc"
+      ]
+    },
+    {
+      "expected_rows": 3000,
+      "source_rows": 3000,
+      "target_rows": 3000,
+      "matched_primary_keys": 3000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "status": "PASS",
+      "source_table": "commerce.products",
+      "target_table": "bronze.oltp_products",
+      "primary_key": [
+        "product_id"
+      ],
+      "compared_source_columns": [
+        "product_id",
+        "sku",
+        "product_name",
+        "category",
+        "list_price_egp",
+        "created_at",
+        "updated_at"
+      ],
+      "excluded_lineage_columns": [
+        "_ingested_at_utc"
+      ]
+    }
+  ],
+  "status": "PASS"
+}

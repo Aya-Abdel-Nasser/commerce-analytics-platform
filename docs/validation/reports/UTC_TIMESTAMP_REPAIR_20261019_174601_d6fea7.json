@@ -1,0 +1,67 @@
+{
+  "run_token": "20261019_174601_d6fea7",
+  "started_at_utc": "2026-10-19T17:46:01.975446+00:00",
+  "mode": "DRY_RUN",
+  "status": "DRY_RUN_PASS",
+  "source": "commerce_oltp_dev.commerce",
+  "target_database": "commerce_warehouse_dev",
+  "tables": [
+    {
+      "table": "products",
+      "status": "DRY_RUN_PASS",
+      "bronze_table": "bronze.oltp_products",
+      "rows_checked": 3000,
+      "timestamp_mismatch_rows": 3000,
+      "timestamp_mismatches_by_column": {
+        "created_at": 3000,
+        "updated_at": 3000
+      },
+      "mode": "DRY_RUN",
+      "backup_table": null,
+      "updated_rows": 0
+    },
+    {
+      "table": "customers",
+      "status": "DRY_RUN_PASS",
+      "bronze_table": "bronze.oltp_customers",
+      "rows_checked": 50000,
+      "timestamp_mismatch_rows": 50000,
+      "timestamp_mismatches_by_column": {
+        "created_at": 50000,
+        "updated_at": 50000
+      },
+      "mode": "DRY_RUN",
+      "backup_table": null,
+      "updated_rows": 0
+    },
+    {
+      "table": "orders",
+      "status": "DRY_RUN_PASS",
+      "bronze_table": "bronze.oltp_orders",
+      "rows_checked": 200000,
+      "timestamp_mismatch_rows": 200000,
+      "timestamp_mismatches_by_column": {
+        "order_date": 200000,
+        "updated_at": 200000
+      },
+      "mode": "DRY_RUN",
+      "backup_table": null,
+      "updated_rows": 0
+    },
+    {
+      "table": "payments",
+      "status": "DRY_RUN_PASS",
+      "bronze_table": "bronze.oltp_payments",
+      "rows_checked": 215000,
+      "timestamp_mismatch_rows": 175000,
+      "timestamp_mismatches_by_column": {
+        "payment_date": 175000
+      },
+      "mode": "DRY_RUN",
+      "backup_table": null,
+      "updated_rows": 0
+    }
+  ],
+  "note": "No credentials or row values included. Original Informatica pipelines unchanged.",
+  "finished_at_utc": "2026-10-19T17:48:05.910268+00:00"
+}

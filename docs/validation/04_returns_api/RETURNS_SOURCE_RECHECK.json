@@ -1,0 +1,95 @@
+{
+  "overall_status": "PASS",
+  "source_file": "/mnt/data/_returns_source_recheck/returns_initial.jsonl",
+  "manifest_file": "/mnt/data/_returns_source_recheck/manifest.json",
+  "file_size_bytes": 8072732,
+  "source_file_sha256": "3a352fda4b17a5c62fc167a6d613b576dd2fb67d47e30850aab221191f12f0e7",
+  "source_sha256_pinned": "3a352fda4b17a5c62fc167a6d613b576dd2fb67d47e30850aab221191f12f0e7",
+  "rows": {
+    "physical_lines": 22093,
+    "valid_json_objects": 22093
+  },
+  "expected_rows": 22093,
+  "max_json_line_characters": 369,
+  "max_json_line_bytes": 369,
+  "distinct_return_ids": 22093,
+  "distinct_order_numbers": 22093,
+  "return_status_counts": {
+    "APPROVED": 5406,
+    "REFUNDED": 5558,
+    "REJECTED": 5611,
+    "REQUESTED": 5518
+  },
+  "reason_code_counts": {
+    "CHANGED_MIND": 5552,
+    "NOT_AS_DESCRIBED": 5550,
+    "QUALITY_ISSUE": 5412,
+    "WRONG_ITEM": 5579
+  },
+  "observed_json_types": {
+    "$._ingested_at_utc": {
+      "string": 22093
+    },
+    "$._source_endpoint": {
+      "string": 22093
+    },
+    "$._source_system": {
+      "string": 22093
+    },
+    "$.payload": {
+      "object": 22093
+    },
+    "$.payload.order_number": {
+      "string": 22093
+    },
+    "$.payload.reason_code": {
+      "string": 22093
+    },
+    "$.payload.requested_at": {
+      "string": 22093
+    },
+    "$.payload.requested_refund_egp": {
+      "string": 22093
+    },
+    "$.payload.return_id": {
+      "string": 22093
+    },
+    "$.payload.return_status": {
+      "string": 22093
+    },
+    "$.payload.updated_at": {
+      "string": 22093
+    }
+  },
+  "requested_at_utc_min": "2025-10-13T09:12:00+00:00",
+  "requested_at_utc_max": "2026-09-23T21:43:00+00:00",
+  "updated_at_utc_min": "2025-10-13T09:12:00+00:00",
+  "updated_at_utc_max": "2026-09-27T21:43:00+00:00",
+  "refund_min": "188.73",
+  "refund_max": "41280.57",
+  "manifest_checks": {
+    "source_file_named_in_manifest": true,
+    "manifest_rows_match": true,
+    "manifest_expected_rows": true,
+    "manifest_source_system": true,
+    "manifest_endpoint": true,
+    "manifest_page_size": true,
+    "manifest_pages": true,
+    "manifest_pages_cover_rows": true,
+    "total_expected": true,
+    "return_id_distinct_expected": true,
+    "order_number_distinct_initial_snapshot": true,
+    "statuses_match_source_baseline": true,
+    "reason_codes_match_source_baseline": true,
+    "no_record_over_precision_1000": true,
+    "pinned_source_file_sha256_matches": true
+  },
+  "errors": {},
+  "error_samples": {},
+  "important_notes": [
+    "Source is a local MOCK REST API extract; do not infer live API pagination from the JSONL.",
+    "Only the source is validated here. SQL Server has NOT been accessed.",
+    "CSV/JSONL has no declared SQL keys or column constraints; observed uniqueness is not a PK.",
+    "SHA-256 is calculated on original archived UTF-8 bytes; SQL NVARCHAR stores decoded Unicode text."
+  ]
+}

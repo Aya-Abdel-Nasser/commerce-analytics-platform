@@ -1,0 +1,169 @@
+{
+  "report_type": "full_keyed_source_to_target_comparison",
+  "executed_at_utc": "2026-10-18T15:12:51.423265+00:00",
+  "scope": "MySQL CRM initial snapshot",
+  "mysql_host": "127.0.0.1",
+  "mysql_port": 53306,
+  "sqlserver_instance": ".\\SQLEXPRESS",
+  "sqlserver_database": "commerce_warehouse_dev",
+  "raw_source_values_logged": false,
+  "table_results": [
+    {
+      "expected_source_snapshot_rows": 50000,
+      "source_rows": 50000,
+      "target_rows": 50000,
+      "matched_primary_keys": 50000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "sample_keys": [],
+      "status": "PASS",
+      "source_table": "commerce_crm_dev.crm_customers",
+      "target_table": "bronze.crm_customers",
+      "primary_key": [
+        "crm_customer_id"
+      ],
+      "compared_columns": [
+        "crm_customer_id",
+        "external_customer_code",
+        "signup_at",
+        "customer_segment",
+        "marketing_opt_in",
+        "preferred_channel",
+        "updated_at"
+      ]
+    },
+    {
+      "expected_source_snapshot_rows": 35000,
+      "source_rows": 35000,
+      "target_rows": 35000,
+      "matched_primary_keys": 35000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "sample_keys": [],
+      "status": "PASS",
+      "source_table": "commerce_crm_dev.loyalty_accounts",
+      "target_table": "bronze.crm_loyalty_accounts",
+      "primary_key": [
+        "loyalty_account_id"
+      ],
+      "compared_columns": [
+        "loyalty_account_id",
+        "crm_customer_id",
+        "loyalty_tier",
+        "points_balance",
+        "enrolled_at",
+        "updated_at"
+      ]
+    },
+    {
+      "expected_source_snapshot_rows": 175000,
+      "source_rows": 175000,
+      "target_rows": 175000,
+      "matched_primary_keys": 175000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "sample_keys": [],
+      "status": "PASS",
+      "source_table": "commerce_crm_dev.loyalty_transactions",
+      "target_table": "bronze.crm_loyalty_transactions",
+      "primary_key": [
+        "loyalty_transaction_id"
+      ],
+      "compared_columns": [
+        "loyalty_transaction_id",
+        "loyalty_account_id",
+        "transaction_type",
+        "points_delta",
+        "reference_order_number",
+        "occurred_at"
+      ]
+    },
+    {
+      "expected_source_snapshot_rows": 120,
+      "source_rows": 120,
+      "target_rows": 120,
+      "matched_primary_keys": 120,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "sample_keys": [],
+      "status": "PASS",
+      "source_table": "commerce_crm_dev.campaigns",
+      "target_table": "bronze.crm_campaigns",
+      "primary_key": [
+        "campaign_id"
+      ],
+      "compared_columns": [
+        "campaign_id",
+        "campaign_code",
+        "campaign_name",
+        "channel",
+        "campaign_status",
+        "starts_at",
+        "ends_at",
+        "updated_at"
+      ]
+    },
+    {
+      "expected_source_snapshot_rows": 360000,
+      "source_rows": 360000,
+      "target_rows": 360000,
+      "matched_primary_keys": 360000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "sample_keys": [],
+      "status": "PASS",
+      "source_table": "commerce_crm_dev.campaign_memberships",
+      "target_table": "bronze.crm_campaign_memberships",
+      "primary_key": [
+        "campaign_id",
+        "crm_customer_id"
+      ],
+      "compared_columns": [
+        "campaign_id",
+        "crm_customer_id",
+        "engagement_status",
+        "targeted_at",
+        "engaged_at",
+        "updated_at"
+      ]
+    },
+    {
+      "expected_source_snapshot_rows": 45000,
+      "source_rows": 45000,
+      "target_rows": 45000,
+      "matched_primary_keys": 45000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "sample_keys": [],
+      "status": "PASS",
+      "source_table": "commerce_crm_dev.support_tickets",
+      "target_table": "bronze.crm_support_tickets",
+      "primary_key": [
+        "ticket_id"
+      ],
+      "compared_columns": [
+        "ticket_id",
+        "ticket_number",
+        "crm_customer_id",
+        "issue_category",
+        "ticket_status",
+        "created_at",
+        "resolved_at",
+        "updated_at"
+      ]
+    }
+  ],
+  "status": "PASS"
+}

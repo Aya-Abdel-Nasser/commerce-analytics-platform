@@ -1,0 +1,176 @@
+{
+  "project": "Commerce Analytics Engineering Platform",
+  "dataset": "Partner Shipping initial CSV",
+  "mode": "READ_ONLY",
+  "source_directory": "/tmp/commerce_review/data/landing/partners/prodlike/initial",
+  "timestamp_format": "MM/dd/yyyy HH:mm:ss",
+  "file_inventory": [
+    {
+      "file": "egx_shipments_initial.csv",
+      "carrier": "EGX",
+      "bytes": 3441793,
+      "sha256": "532072411f17f96e2784880ff0ea72fb9a2087d31825fb36f26da6fc38f580c1",
+      "rows": 29943
+    },
+    {
+      "file": "fst_shipments_initial.csv",
+      "carrier": "FST",
+      "bytes": 3463241,
+      "sha256": "7eec729f017f63b3b215f5db2230794ad8572683cdbcd37866dd07b2326c7053",
+      "rows": 30136
+    },
+    {
+      "file": "nil_shipments_initial.csv",
+      "carrier": "NIL",
+      "bytes": 3436476,
+      "sha256": "8b2515e705915df7b43de1422057f774086f6b48c66244ac38fa53d4b713e872",
+      "rows": 29903
+    },
+    {
+      "file": "dlv_shipments_initial.csv",
+      "carrier": "DLV",
+      "bytes": 3451951,
+      "sha256": "00b9eadb239404fa2eae35fec019999b7ef49a55fec031fea621dc1f9a2e2af5",
+      "rows": 30018
+    }
+  ],
+  "columns": [
+    "shipment_id",
+    "order_number",
+    "carrier_code",
+    "tracking_number",
+    "shipment_status",
+    "shipped_at",
+    "delivered_at",
+    "shipping_fee_egp",
+    "source_updated_at"
+  ],
+  "manifest_present": true,
+  "manifest_metadata": {
+    "timestamp_timezone": "UTC",
+    "timestamp_format": "MM/dd/yyyy HH:mm:ss",
+    "shipments_written": 120000,
+    "counts_by_carrier": {
+      "EGX": 29943,
+      "FST": 30136,
+      "NIL": 29903,
+      "DLV": 30018
+    },
+    "counts_by_status": {
+      "DELIVERED": 80000,
+      "IN_TRANSIT": 37647,
+      "DELAYED": 2353
+    }
+  },
+  "file_list": [
+    "egx_shipments_initial.csv",
+    "fst_shipments_initial.csv",
+    "nil_shipments_initial.csv",
+    "dlv_shipments_initial.csv"
+  ],
+  "total_rows": 120000,
+  "rows_by_carrier": {
+    "DLV": 30018,
+    "EGX": 29943,
+    "FST": 30136,
+    "NIL": 29903
+  },
+  "rows_by_status": {
+    "DELAYED": 2353,
+    "DELIVERED": 80000,
+    "IN_TRANSIT": 37647
+  },
+  "rows_by_carrier_and_status": {
+    "DLV|DELAYED": 521,
+    "DLV|DELIVERED": 20085,
+    "DLV|IN_TRANSIT": 9412,
+    "EGX|DELAYED": 618,
+    "EGX|DELIVERED": 19966,
+    "EGX|IN_TRANSIT": 9359,
+    "FST|DELAYED": 635,
+    "FST|DELIVERED": 20056,
+    "FST|IN_TRANSIT": 9445,
+    "NIL|DELAYED": 579,
+    "NIL|DELIVERED": 19893,
+    "NIL|IN_TRANSIT": 9431
+  },
+  "observed_empty_strings": {
+    "shipment_id": 0,
+    "order_number": 0,
+    "carrier_code": 0,
+    "tracking_number": 0,
+    "shipment_status": 0,
+    "shipped_at": 0,
+    "delivered_at": 40000,
+    "shipping_fee_egp": 0,
+    "source_updated_at": 0
+  },
+  "observed_whitespace_only": {
+    "shipment_id": 0,
+    "order_number": 0,
+    "carrier_code": 0,
+    "tracking_number": 0,
+    "shipment_status": 0,
+    "shipped_at": 0,
+    "delivered_at": 0,
+    "shipping_fee_egp": 0,
+    "source_updated_at": 0
+  },
+  "observed_distinct_candidate_keys": {
+    "shipment_id": 120000,
+    "order_number": 120000,
+    "tracking_number": 120000
+  },
+  "observed_min_nonempty_lengths": {
+    "shipment_id": 12,
+    "order_number": 12,
+    "carrier_code": 3,
+    "tracking_number": 13,
+    "shipment_status": 7,
+    "shipped_at": 19,
+    "delivered_at": 19,
+    "shipping_fee_egp": 5,
+    "source_updated_at": 19
+  },
+  "observed_max_lengths": {
+    "shipment_id": 12,
+    "order_number": 12,
+    "carrier_code": 3,
+    "tracking_number": 13,
+    "shipment_status": 10,
+    "shipped_at": 19,
+    "delivered_at": 19,
+    "shipping_fee_egp": 5,
+    "source_updated_at": 19
+  },
+  "shipping_fee_min_max": {
+    "min": "35.02",
+    "max": "99.99",
+    "physical_type": "CSV text",
+    "observed_decimal_precision": 4,
+    "observed_decimal_scale": 2,
+    "declared_precision_scale": null
+  },
+  "timestamp_ranges": {
+    "shipped_at": {
+      "min": "10/08/2025 10:34:00",
+      "max": "10/09/2026 06:55:00"
+    },
+    "delivered_at": {
+      "min": "10/10/2025 12:34:00",
+      "max": "10/14/2026 17:31:00"
+    },
+    "source_updated_at": {
+      "min": "10/08/2025 11:46:00",
+      "max": "10/14/2026 17:31:00"
+    }
+  },
+  "validation_errors": {},
+  "error_examples": {},
+  "result": "PASS",
+  "schema_note": "CSV has no enforced PK, FK, NOT NULL, datatype, precision or scale; all observations are empirical.",
+  "baseline_sha256_validation": {
+    "result": "PASS",
+    "mismatches": {}
+  }
+}

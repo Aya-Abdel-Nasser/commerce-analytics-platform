@@ -1,0 +1,71 @@
+{
+  "result": "PASS",
+  "comparison": "EXACT Unicode raw JSON line text multiset, including duplicates; order independent",
+  "source_root": "D:\\Data_Engineer_Work_With_VSCode\\Projects\\commerce-analytics-platform\\data\\landing\\events\\prodlike\\initial",
+  "target": "bronze.app_events_raw",
+  "manifest_expected_rows": 1630000,
+  "source_rows": 1630000,
+  "target_rows": 1630000,
+  "per_source_file": [
+    {
+      "file": "part-00001.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00002.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00003.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00004.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00005.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00006.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00007.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00008.jsonl",
+      "actual_rows": 200000,
+      "manifest_rows": 200000,
+      "pass": true
+    },
+    {
+      "file": "part-00009.jsonl",
+      "actual_rows": 30000,
+      "manifest_rows": 30000,
+      "pass": true
+    }
+  ],
+  "missing_exact_text_occurrences": 0,
+  "unexpected_exact_text_occurrences": 0,
+  "issues": {},
+  "samples_missing_sha256": [],
+  "samples_extra_sha256": [],
+  "note": "Compares JSON Unicode TEXT, not original JSONL file bytes, file/line lineage or row order. Direct ODBC is preferred over CSV export."
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "profile": "prodlike",
+  "mode": "initial",
+  "seed": 20261008,
+  "source": "data/generated/oltp/prodlike/initial",
+  "order_sessions": 200000,
+  "browse_only_sessions": 150000,
+  "event_records": 1630000,
+  "late_arriving_event_records": 11897,
+  "event_types": {
+    "added_to_cart": 230000,
+    "checkout_cancelled": 20000,
+    "checkout_started": 200000,
+    "order_submitted": 200000,
+    "payment_submitted": 140000,
+    "product_viewed": 350000,
+    "purchase_completed": 140000,
+    "session_started": 350000
+  },
+  "parts": [
+    {
+      "file": "part-00001.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00002.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00003.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00004.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00005.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00006.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00007.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00008.jsonl",
+      "rows": 200000
+    },
+    {
+      "file": "part-00009.jsonl",
+      "rows": 30000
+    }
+  ]
+}

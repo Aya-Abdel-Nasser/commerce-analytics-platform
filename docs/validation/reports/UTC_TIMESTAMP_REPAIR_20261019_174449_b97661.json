@@ -1,0 +1,12 @@
+{
+  "run_token": "20261019_174449_b97661",
+  "started_at_utc": "2026-10-19T17:44:49.246735+00:00",
+  "mode": "DRY_RUN",
+  "status": "ERROR",
+  "source": "commerce_oltp_dev.commerce",
+  "target_database": "commerce_warehouse_dev",
+  "tables": [],
+  "note": "No credentials or row values included. Original Informatica pipelines unchanged.",
+  "error_type": "OperationalError",
+  "finished_at_utc": "2026-10-19T17:44:51.301929+00:00"
+}

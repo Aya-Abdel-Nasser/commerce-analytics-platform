@@ -1,0 +1,70 @@
+{
+  "run_token": "20261019_180610_f53a64",
+  "started_at_utc": "2026-10-19T18:06:10.691877+00:00",
+  "mode": "APPLY",
+  "status": "APPLIED_NEEDS_RECONCILIATION",
+  "source": "commerce_oltp_dev.commerce",
+  "target_database": "commerce_warehouse_dev",
+  "tables": [
+    {
+      "table": "products",
+      "status": "ALREADY_CORRECT",
+      "bronze_table": "bronze.oltp_products",
+      "rows_checked": 3000,
+      "timestamp_mismatch_rows": 0,
+      "timestamp_mismatches_by_column": {
+        "created_at": 0,
+        "updated_at": 0
+      },
+      "mode": "APPLY",
+      "backup_table": null,
+      "updated_rows": 0
+    },
+    {
+      "table": "customers",
+      "status": "UPDATED_NEEDS_RECONCILIATION",
+      "bronze_table": "bronze.oltp_customers",
+      "rows_checked": 50000,
+      "timestamp_mismatch_rows": 50000,
+      "timestamp_mismatches_by_column": {
+        "created_at": 50000,
+        "updated_at": 50000
+      },
+      "mode": "APPLY",
+      "backup_table": "validation_probe.utc_backup_customers_20261019_180610_f53a64",
+      "updated_rows": 50000,
+      "rollback_sql": "docs\\validation\\reports\\UTC_REPAIR_ROLLBACK_customers_20261019_180610_f53a64.sql"
+    },
+    {
+      "table": "orders",
+      "status": "UPDATED_NEEDS_RECONCILIATION",
+      "bronze_table": "bronze.oltp_orders",
+      "rows_checked": 200000,
+      "timestamp_mismatch_rows": 200000,
+      "timestamp_mismatches_by_column": {
+        "order_date": 200000,
+        "updated_at": 200000
+      },
+      "mode": "APPLY",
+      "backup_table": "validation_probe.utc_backup_orders_20261019_180610_f53a64",
+      "updated_rows": 200000,
+      "rollback_sql": "docs\\validation\\reports\\UTC_REPAIR_ROLLBACK_orders_20261019_180610_f53a64.sql"
+    },
+    {
+      "table": "payments",
+      "status": "UPDATED_NEEDS_RECONCILIATION",
+      "bronze_table": "bronze.oltp_payments",
+      "rows_checked": 215000,
+      "timestamp_mismatch_rows": 175000,
+      "timestamp_mismatches_by_column": {
+        "payment_date": 175000
+      },
+      "mode": "APPLY",
+      "backup_table": "validation_probe.utc_backup_payments_20261019_180610_f53a64",
+      "updated_rows": 175000,
+      "rollback_sql": "docs\\validation\\reports\\UTC_REPAIR_ROLLBACK_payments_20261019_180610_f53a64.sql"
+    }
+  ],
+  "note": "No credentials or row values included. Original Informatica pipelines unchanged.",
+  "finished_at_utc": "2026-10-19T18:06:23.311133+00:00"
+}

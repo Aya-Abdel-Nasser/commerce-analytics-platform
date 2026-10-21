@@ -1,0 +1,27 @@
+{
+  "run_token": "20261019_180249_a6bb92",
+  "started_at_utc": "2026-10-19T18:02:49.599871+00:00",
+  "mode": "APPLY",
+  "status": "APPLIED_NEEDS_RECONCILIATION",
+  "source": "commerce_oltp_dev.commerce",
+  "target_database": "commerce_warehouse_dev",
+  "tables": [
+    {
+      "table": "products",
+      "status": "UPDATED_NEEDS_RECONCILIATION",
+      "bronze_table": "bronze.oltp_products",
+      "rows_checked": 3000,
+      "timestamp_mismatch_rows": 3000,
+      "timestamp_mismatches_by_column": {
+        "created_at": 3000,
+        "updated_at": 3000
+      },
+      "mode": "APPLY",
+      "backup_table": "validation_probe.utc_backup_products_20261019_180249_a6bb92",
+      "updated_rows": 3000,
+      "rollback_sql": "docs\\validation\\reports\\UTC_REPAIR_ROLLBACK_products_20261019_180249_a6bb92.sql"
+    }
+  ],
+  "note": "No credentials or row values included. Original Informatica pipelines unchanged.",
+  "finished_at_utc": "2026-10-19T18:02:49.902901+00:00"
+}

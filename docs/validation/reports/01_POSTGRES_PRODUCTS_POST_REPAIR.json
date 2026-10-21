@@ -1,0 +1,43 @@
+{
+  "report_type": "full_keyed_source_to_target_comparison",
+  "executed_at_utc": "2026-10-19T18:04:04.775084+00:00",
+  "scope": "PostgreSQL OLTP initial snapshot",
+  "pg_host": "127.0.0.1",
+  "pg_port": 15432,
+  "pg_database": "commerce_oltp_dev",
+  "sqlserver_database": "commerce_warehouse_dev",
+  "source_timezone": "UTC",
+  "sqlserver_datetime2_timezone_assumption": "UTC wall-clock",
+  "raw_customer_values_logged": false,
+  "table_results": [
+    {
+      "expected_rows": 3000,
+      "source_rows": 3000,
+      "target_rows": 3000,
+      "matched_primary_keys": 3000,
+      "missing_in_target": 0,
+      "unexpected_in_target": 0,
+      "rows_with_value_mismatches": 0,
+      "value_mismatches_by_column": {},
+      "status": "PASS",
+      "source_table": "commerce.products",
+      "target_table": "bronze.oltp_products",
+      "primary_key": [
+        "product_id"
+      ],
+      "compared_source_columns": [
+        "product_id",
+        "sku",
+        "product_name",
+        "category",
+        "list_price_egp",
+        "created_at",
+        "updated_at"
+      ],
+      "excluded_lineage_columns": [
+        "_ingested_at_utc"
+      ]
+    }
+  ],
+  "status": "PASS"
+}
