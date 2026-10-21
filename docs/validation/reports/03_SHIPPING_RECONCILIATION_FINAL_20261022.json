@@ -1,0 +1,44 @@
+{
+  "result": "PASS",
+  "comparison": "Exact column-by-column (case-sensitive, whitespace-sensitive, text representation sensitive)",
+  "allow_null_delivered_at": true,
+  "allowed_empty_csv_to_null_sql_conversions": 40000,
+  "source_rows": 120000,
+  "source_distinct_shipment_ids": 120000,
+  "target_rows": 120000,
+  "matched_shipment_ids": 120000,
+  "missing_in_target_count": 0,
+  "missing_in_target_examples": [],
+  "extra_in_target_count": 0,
+  "extra_in_target_examples": [],
+  "duplicate_source_id_count": 0,
+  "duplicate_source_id_examples": [],
+  "duplicate_target_id_count": 0,
+  "duplicate_target_id_examples": [],
+  "mismatched_rows": 0,
+  "mismatched_fields_by_column": {},
+  "mismatch_examples": [],
+  "source_carrier_counts": {
+    "DLV": 30018,
+    "EGX": 29943,
+    "FST": 30136,
+    "NIL": 29903
+  },
+  "target_carrier_counts": {
+    "DLV": 30018,
+    "EGX": 29943,
+    "FST": 30136,
+    "NIL": 29903
+  },
+  "source_status_counts": {
+    "DELAYED": 2353,
+    "DELIVERED": 80000,
+    "IN_TRANSIT": 37647
+  },
+  "target_status_counts": {
+    "DELAYED": 2353,
+    "DELIVERED": 80000,
+    "IN_TRANSIT": 37647
+  },
+  "note": "CSV export mode cannot reliably distinguish SQL NULL from an empty string. Use direct SQL mode for NULL-sensitive exact reconciliation."
+}

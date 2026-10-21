@@ -1,0 +1,33 @@
+{
+  "overall_status": "PASS",
+  "comparison_level": "EXACT Unicode JSON text multiset (row order independent)",
+  "expected_rows": 22093,
+  "source_rows": 22093,
+  "target_rows": 22093,
+  "source_distinct_raw_texts": 22093,
+  "target_distinct_raw_texts": 22093,
+  "raw_text_missing_occurrences": 0,
+  "raw_text_unexpected_occurrences": 0,
+  "source_return_ids_missing_from_target": 0,
+  "target_return_ids_missing_from_source": 0,
+  "duplicate_source_return_ids": 0,
+  "duplicate_target_return_ids": 0,
+  "json_semantically_equal_but_raw_text_differs_ids": 0,
+  "all_return_ids_compared": 22093,
+  "issues": {},
+  "examples": {
+    "missing_id_samples": [],
+    "unexpected_id_samples": [],
+    "duplicate_source_id_samples": [],
+    "duplicate_target_id_samples": [],
+    "changed_row_samples": [],
+    "missing_raw_text_sha256_samples": [],
+    "extra_raw_text_sha256_samples": []
+  },
+  "notes": [
+    "PASS proves a full multiset match of source JSON line TEXT and SQL raw_json TEXT, not source file byte identity.",
+    "SQL NVARCHAR(MAX) stores Unicode, while original archived JSONL is UTF-8; source file SHA-256 independently covers original bytes.",
+    "source_file_name/source_line_number are nullable pipeline lineage and not part of JSONL source; check them with target SQL script.",
+    "A PASS from a CSV target export assumes the export faithfully preserves SQL raw_json text; direct pyodbc is stronger."
+  ]
+}
