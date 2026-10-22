@@ -1,0 +1,20 @@
+
+version: 2
+
+models:
+  - name: stg_oltp_customers
+    description: >
+      Staging view for PostgreSQL OLTP customers.
+      Reads from the validated Bronze snapshot.
+
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ingested_at_utc
+        description: "Timestamp when the record entered Bronze."
+        data_tests:
+          - not_null

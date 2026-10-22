@@ -1,0 +1,57 @@
+
+version: 2
+
+sources:
+  - name: postgres_oltp
+    schema: bronze
+    tables:
+      - name: oltp_orders
+      - name: oltp_order_items
+
+      - name: oltp_customers
+        description: "Validated PostgreSQL OLTP customer snapshot in Bronze."
+        columns:
+          - name: customer_id
+            description: "Source primary key."
+            data_tests:
+              - not_null
+              - unique
+
+      - name: oltp_products
+      - name: oltp_payments
+
+  - name: mysql_crm
+    schema: bronze
+    tables:
+      - name: crm_customers
+      - name: crm_loyalty_accounts
+      - name: crm_loyalty_transactions
+      - name: crm_campaigns
+
+
+      - name: crm_campaign_memberships
+        description: "CRM campaign memberships from the validated Bronze snapshot."
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - campaign_id
+                  - crm_customer_id
+
+
+      - name: crm_support_tickets
+
+  - name: partner_shipping
+    schema: bronze
+    tables:
+      - name: partner_shipments
+
+  - name: returns_api
+    schema: bronze
+    tables:
+      - name: returns_raw
+
+  - name: application_events
+    schema: bronze
+    tables:
+      - name: app_events_raw
