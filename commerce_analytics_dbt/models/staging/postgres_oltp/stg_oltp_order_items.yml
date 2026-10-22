@@ -1,0 +1,58 @@
+
+version: 2
+
+models:
+  - name: stg_oltp_order_items
+    description: "Staging model for PostgreSQL OLTP order line items."
+
+    columns:
+      - name: order_item_id
+        data_type: bigint
+        description: "Unique identifier for each order line item."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        data_type: bigint
+        description: "Order identifier referencing staging orders."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_orders')
+                field: order_id
+
+      - name: product_id
+        data_type: bigint
+        description: "Product identifier referencing staging products."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_products')
+                field: product_id
+
+      - name: quantity
+        data_type: bigint
+        description: "Quantity of the product in the order line."
+        data_tests:
+          - not_null
+
+      - name: unit_price_egp
+        data_type: decimal
+        description: "Unit price in Egyptian pounds."
+        data_tests:
+          - not_null
+
+      - name: discount_amount_egp
+        data_type: decimal
+        description: "Discount amount applied to the order line."
+        data_tests:
+          - not_null
+
+      - name: ingested_at_utc
+        data_type: datetime2
+        description: "Bronze ingestion timestamp in UTC."
+        data_tests:
+          - not_null

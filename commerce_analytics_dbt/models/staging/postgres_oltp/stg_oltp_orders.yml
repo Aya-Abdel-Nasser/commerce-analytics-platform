@@ -1,0 +1,68 @@
+
+version: 2
+
+models:
+  - name: stg_oltp_orders
+    description: "Staging model for PostgreSQL OLTP orders."
+
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_number
+        description: "Business-facing order number."
+        data_tests:
+          - not_null
+          - unique
+
+
+      - name: customer_id
+        description: "Foreign key referencing staging customers."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_customers')
+                field: customer_id
+
+
+      - name: order_status
+        description: "Order lifecycle status."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - CREATED
+                  - PAID
+                  - SHIPPED
+                  - DELIVERED
+                  - CANCELLED
+
+      - name: sales_channel
+        description: "Channel where the order was placed."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - WEB
+                  - MOBILE
+
+      - name: order_date
+        description: "Order creation timestamp."
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: "Latest order update timestamp."
+        data_tests:
+          - not_null
+
+      - name: ingested_at_utc
+        description: "Bronze ingestion timestamp."
+        data_tests:
+          - not_null
