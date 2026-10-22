@@ -1,0 +1,45 @@
+
+version: 2
+
+models:
+  - name: stg_oltp_products
+    description: "Staging model for products from PostgreSQL OLTP."
+
+    columns:
+      - name: product_id
+        description: "Unique identifier for each product."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: sku
+        description: "Unique, non-blank product stock keeping unit."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: "Product display name."
+        data_tests:
+          - not_null
+
+      - name: category
+        description: "Product category from the OLTP source."
+
+
+      - name: list_price_egp
+        description: "Product list price in EGP; must be greater than zero."
+        data_tests:
+          - not_null
+
+      - name: created_at
+        description: "Timestamp when the product was created."
+
+      - name: updated_at
+        description: "Timestamp when the product was last updated."
+
+
+      - name: ingested_at_utc
+        description: "Timestamp of Bronze ingestion."
+        data_tests:
+          - not_null

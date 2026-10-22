@@ -1,0 +1,68 @@
+
+version: 2
+
+models:
+  - name: stg_oltp_payments
+    description: "Staging model for PostgreSQL OLTP payments."
+
+    columns:
+      - name: payment_id
+        data_type: bigint
+        description: "Unique identifier for each payment record."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: transaction_id
+        data_type: nvarchar
+        description: "Payment transaction reference."
+        data_tests:
+          - not_null
+          - unique
+      - name: order_id
+        data_type: bigint
+        description: "Order identifier associated with the payment."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_orders')
+                field: order_id
+
+
+      - name: payment_method
+        data_type: nvarchar
+        description: "Method used to process the payment."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['CARD', 'WALLET']
+
+
+
+      - name: payment_status
+        data_type: nvarchar
+        description: "Current payment processing status."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['SUCCESS', 'PENDING', 'FAILED']
+
+
+      - name: amount_egp
+        data_type: decimal
+        description: "Payment amount in Egyptian pounds."
+        data_tests:
+          - not_null
+
+      - name: payment_date
+        data_type: datetime2
+        description: "Payment timestamp, nullable depending on payment status."
+
+      - name: ingested_at_utc
+        data_type: datetime2
+        description: "Bronze ingestion timestamp in UTC."
+        data_tests:
+          - not_null
