@@ -1,0 +1,70 @@
+
+name: dbt Static CI
+
+on:
+  pull_request:
+    paths:
+      - 'commerce_analytics_dbt/**'
+      - '.github/workflows/dbt-ci.yml'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dbt-parse:
+    name: Validate dbt project
+    runs-on: windows-2022
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt dependencies
+        run: |
+          python -m pip install "dbt-core==1.12.6" "dbt-sqlserver==1.12.1"
+
+
+      - name: Create isolated CI profile
+        run: |
+          $profileDir = Join-Path $env:RUNNER_TEMP "dbt-profile"
+          New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+
+          $profileContent = @'
+          commerce_analytics_dbt:
+            target: ci
+            outputs:
+              ci:
+                type: sqlserver
+                driver: 'ODBC Driver 18 for SQL Server'
+                host: localhost
+                port: 1433
+                database: ci_placeholder
+                schema: dbt_ci
+                windows_login: true
+                threads: 2
+          '@
+
+          $profileContent | Set-Content `
+            -Path (Join-Path $profileDir "profiles.yml") `
+            -Encoding utf8
+
+          "CI_PROFILE_DIR=$profileDir" >> $env:GITHUB_ENV
+
+      - name: Install dbt packages
+        run: |
+          dbt deps --project-dir commerce_analytics_dbt
+
+      - name: Parse dbt project
+        run: |
+          dbt parse --project-dir commerce_analytics_dbt --profiles-dir "$env:CI_PROFILE_DIR" --target ci --no-partial-parse

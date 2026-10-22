@@ -1,0 +1,30 @@
+name: 'commerce_analytics_dbt'
+version: '1.0.0'
+profile: 'commerce_analytics_dbt'
+
+model-paths: ['models']
+analysis-paths: ['analyses']
+test-paths: ['tests']
+seed-paths: ['seeds']
+macro-paths: ['macros']
+snapshot-paths: ['snapshots']
+
+clean-targets:
+  - 'target'
+  - 'dbt_packages'
+
+models:
+  commerce_analytics_dbt:
+    +materialized: view
+
+    staging:
+      +schema: silver
+      +materialized: view
+
+    intermediate:
+      +schema: silver
+      +materialized: view
+
+    marts:
+      +schema: gold
+      +materialized: table
