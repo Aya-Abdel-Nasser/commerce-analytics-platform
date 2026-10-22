@@ -6,7 +6,7 @@ with expected as (
 
     select
         customer_id,
-        {{ clean_optional_text('city') }} as city
+        NULLIF(LTRIM(RTRIM(city)), '') as city
     from {{ source('postgres_oltp', 'oltp_customers') }}
 
 ),
