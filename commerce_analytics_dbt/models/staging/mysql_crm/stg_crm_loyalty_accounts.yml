@@ -1,0 +1,50 @@
+
+version: 2
+
+models:
+  - name: stg_crm_loyalty_accounts
+    description: "Staging model for MySQL CRM loyalty accounts."
+
+    columns:
+      - name: loyalty_account_id
+        data_type: decimal
+        description: "Unique identifier for each loyalty account."
+        data_tests:
+          - not_null
+          - unique
+
+
+      - name: crm_customer_id
+        data_type: decimal
+        description: "CRM customer associated with the loyalty account."
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+
+      - name: loyalty_tier
+        data_type: nvarchar
+        description: "Customer loyalty program tier."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['BRONZE', 'SILVER', 'GOLD']
+
+      - name: points_balance
+        data_type: int
+        description: "Current loyalty points balance."
+        data_tests:
+          - not_null
+
+      - name: enrolled_at
+        data_type: datetime2
+        description: "Timestamp when the customer enrolled in the loyalty program."
+
+      - name: updated_at
+        data_type: datetime2
+        description: "Timestamp of the latest loyalty account update."

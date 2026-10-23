@@ -1,0 +1,60 @@
+
+version: 2
+
+models:
+  - name: stg_crm_campaign_memberships
+    description: "Staging model for customer memberships in CRM marketing campaigns."
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - campaign_id
+              - crm_customer_id
+
+    columns:
+      - name: campaign_id
+        data_type: decimal
+        description: "Campaign associated with the customer membership."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_campaigns')
+                field: campaign_id
+
+      - name: crm_customer_id
+        data_type: decimal
+        description: "CRM customer targeted by the campaign."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+
+      - name: engagement_status
+        data_type: nvarchar
+        description: "Current engagement status of the customer within the campaign."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['TARGETED', 'SENT', 'OPENED', 'CONVERTED']
+
+      - name: targeted_at
+        data_type: datetime2
+        description: "Timestamp when the customer was targeted."
+        data_tests:
+          - not_null
+
+      - name: engaged_at
+        data_type: datetime2
+        description: "Timestamp when the customer engaged, if applicable."
+
+      - name: updated_at
+        data_type: datetime2
+        description: "Timestamp of the latest membership update."
+        data_tests:
+          - not_null

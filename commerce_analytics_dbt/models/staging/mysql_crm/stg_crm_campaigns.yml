@@ -1,0 +1,67 @@
+
+version: 2
+
+models:
+  - name: stg_crm_campaigns
+    description: "Staging model for marketing campaigns from MySQL CRM."
+
+    columns:
+      - name: campaign_id
+        data_type: decimal
+        description: "Unique identifier for each CRM campaign."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_code
+        data_type: nvarchar
+        description: "Business-facing campaign reference code."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_name
+        data_type: nvarchar
+        description: "Display name of the marketing campaign."
+
+
+      - name: channel
+        data_type: nvarchar
+        description: "Marketing channel associated with the campaign."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['EMAIL', 'PUSH', 'SMS']
+
+
+
+      - name: campaign_status
+        data_type: nvarchar
+        description: "Current lifecycle status of the campaign."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['DRAFT', 'ACTIVE', 'COMPLETED']
+
+
+
+      - name: starts_at
+        data_type: datetime2
+        description: "Scheduled campaign start timestamp."
+        data_tests:
+          - not_null
+
+
+      - name: ends_at
+        data_type: datetime2
+        description: "Scheduled campaign end timestamp; required by the current provisional data contract."
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        data_type: datetime2
+        description: "Timestamp of the most recent campaign update."
+        data_tests:
+          - not_null

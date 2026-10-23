@@ -1,0 +1,53 @@
+
+version: 2
+
+models:
+  - name: stg_crm_loyalty_transactions
+    description: "Staging model for MySQL CRM loyalty points transactions."
+
+    columns:
+      - name: loyalty_transaction_id
+        data_type: decimal
+        description: "Unique identifier for each loyalty transaction."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: loyalty_account_id
+        data_type: decimal
+        description: "Loyalty account associated with the transaction."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_loyalty_accounts')
+                field: loyalty_account_id
+
+
+      - name: transaction_type
+        data_type: nvarchar
+        description: "Type of loyalty points transaction."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['EARN', 'REDEEM', 'ADJUST']
+
+
+
+      - name: points_delta
+        data_type: int
+        description: "Signed change in loyalty points caused by the transaction."
+        data_tests:
+          - not_null
+
+
+      - name: reference_order_number
+        data_type: nvarchar
+        description: "Optional order reference associated with the transaction."
+
+      - name: occurred_at
+        data_type: datetime2
+        description: "Timestamp when the loyalty transaction occurred."
+        data_tests:
+          - not_null
