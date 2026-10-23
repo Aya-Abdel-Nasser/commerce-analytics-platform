@@ -1,0 +1,57 @@
+
+version: 2
+
+models:
+  - name: stg_crm_customers
+    description: "Staging model for customer data from MySQL CRM."
+
+    columns:
+      - name: crm_customer_id
+        data_type: decimal
+        description: "Unique customer identifier in the CRM system."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: external_customer_code
+        data_type: nvarchar
+        description: "External customer business key used for potential cross-source matching."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: signup_at
+        data_type: datetime2
+        description: "Timestamp when the customer signed up in CRM."
+
+      - name: customer_segment
+        data_type: nvarchar
+        description: "Customer segment assigned by CRM."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['ACTIVE', 'AT_RISK', 'VIP', 'NEW']
+
+      - name: marketing_opt_in
+        data_type: smallint
+        description: "Marketing consent indicator: 1 for opt-in, 0 for opt-out."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: preferred_channel
+        data_type: nvarchar
+        description: "Customer's preferred communication channel."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['EMAIL', 'PUSH', 'SMS', 'NONE']
+
+      - name: updated_at
+        data_type: datetime2
+        description: "Timestamp of the latest CRM customer update."

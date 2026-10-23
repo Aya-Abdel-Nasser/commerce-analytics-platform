@@ -1,0 +1,71 @@
+
+version: 2
+
+models:
+  - name: stg_crm_support_tickets
+    description: "Staging model for customer support tickets from MySQL CRM."
+
+    columns:
+      - name: ticket_id
+        data_type: decimal
+        description: "Unique identifier for each support ticket."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ticket_number
+        data_type: nvarchar
+        description: "Business-facing support ticket reference."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: crm_customer_id
+        data_type: decimal
+        description: "CRM customer associated with the support ticket."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+
+      - name: issue_category
+        data_type: nvarchar
+        description: "Category of the customer support issue."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['DELIVERY', 'PAYMENT', 'PRODUCT', 'RETURN', 'OTHER']
+
+
+
+      - name: ticket_status
+        data_type: nvarchar
+        description: "Current lifecycle status of the support ticket."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']
+
+
+      - name: created_at
+        data_type: datetime2
+        description: "Timestamp when the support ticket was created."
+        data_tests:
+          - not_null
+
+
+      - name: resolved_at
+        data_type: datetime2
+        description: "Timestamp when the support ticket was resolved, if applicable."
+
+
+      - name: updated_at
+        data_type: datetime2
+        description: "Timestamp of the most recent ticket update."
+        data_tests:
+          - not_null
