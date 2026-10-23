@@ -1,0 +1,107 @@
+
+version: 2
+
+models:
+  - name: stg_returns
+    description: >
+      Typed staging model for Returns API records.
+      Extracts nested JSON payload fields while preserving
+      API metadata and file-level data lineage.
+      Each row represents one return record.
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_file_name
+              - source_line_number
+
+    columns:
+      - name: return_id
+        data_type: nvarchar
+        description: "Unique return identifier from the Returns API."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_number
+        data_type: nvarchar
+        description: "Order reference associated with the return."
+        data_tests:
+          - not_null
+
+      - name: reason_code
+        data_type: nvarchar
+        description: "Reason code provided for the return request."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - CHANGED_MIND
+                  - NOT_AS_DESCRIBED
+                  - QUALITY_ISSUE
+                  - WRONG_ITEM
+
+      - name: return_status
+        data_type: nvarchar
+        description: "Current lifecycle status of the return."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - REQUESTED
+                  - APPROVED
+                  - REJECTED
+                  - REFUNDED
+
+      - name: requested_at
+        data_type: datetimeoffset
+        description: "Timestamp when the return was requested."
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        data_type: datetimeoffset
+        description: "Timestamp of the latest return update."
+        data_tests:
+          - not_null
+
+      - name: requested_refund_egp
+        data_type: decimal
+        description: >
+          Requested refund amount in EGP, not necessarily
+          the amount financially settled.
+        data_tests:
+          - not_null
+
+      - name: source_system
+        data_type: nvarchar
+        description: "Source system identified in the API JSON envelope."
+        data_tests:
+          - not_null
+
+      - name: source_endpoint
+        data_type: nvarchar
+        description: "API endpoint recorded in the source JSON."
+        data_tests:
+          - not_null
+
+      - name: ingested_at_utc
+        data_type: datetimeoffset
+        description: "Source-provided ingestion timestamp."
+        data_tests:
+          - not_null
+
+      - name: source_file_name
+        data_type: nvarchar
+        description: "Original JSONL file path captured by Informatica."
+        data_tests:
+          - not_null
+
+      - name: source_line_number
+        data_type: bigint
+        description: "Line number of the JSON record in the source file."
+        data_tests:
+          - not_null

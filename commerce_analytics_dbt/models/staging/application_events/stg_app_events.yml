@@ -1,0 +1,109 @@
+
+version: 2
+
+models:
+  - name: stg_app_events
+    description: >
+      Typed staging model for web and mobile application events.
+      Extracts nested JSON payload fields and preserves source
+      metadata and file-level lineage. Grain: one row per event.
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_file_name
+              - source_line_number
+
+    columns:
+      - name: event_id
+        data_type: nvarchar
+        description: "Unique identifier of the application event."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: event_name
+        data_type: nvarchar
+        description: "Name of the application event."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - session_started
+                  - product_viewed
+                  - added_to_cart
+                  - checkout_started
+                  - order_submitted
+                  - payment_submitted
+                  - purchase_completed
+                  - checkout_cancelled
+
+      - name: session_id
+        data_type: nvarchar
+        description: "Session associated with the event."
+        data_tests:
+          - not_null
+
+      - name: channel
+        data_type: nvarchar
+        description: "Application channel recorded in the event payload."
+
+      - name: customer_code
+        data_type: nvarchar
+        description: >
+          Customer identifier for known users.
+          Nullable for anonymous events.
+
+      - name: anonymous_id
+        data_type: nvarchar
+        description: >
+          Identifier for anonymous users.
+          Nullable for known customers.
+
+      - name: order_number
+        data_type: nvarchar
+        description: >
+          Optional order reference, depending on the event type.
+
+      - name: product_sku
+        data_type: nvarchar
+        description: >
+          Optional product identifier, depending on the event type.
+
+      - name: event_time_utc
+        data_type: datetimeoffset
+        description: "Timestamp when the event occurred."
+        data_tests:
+          - not_null
+
+      - name: received_at_utc
+        data_type: datetimeoffset
+        description: "Timestamp when the application received the event."
+        data_tests:
+          - not_null
+
+      - name: source_system
+        data_type: nvarchar
+        description: "Source application recorded in the JSON envelope."
+        data_tests:
+          - not_null
+
+      - name: source_batch
+        data_type: nvarchar
+        description: "Batch identifier recorded in the JSON envelope."
+        data_tests:
+          - not_null
+
+      - name: source_file_name
+        data_type: nvarchar
+        description: "Original JSONL file path captured by Informatica."
+        data_tests:
+          - not_null
+
+      - name: source_line_number
+        data_type: bigint
+        description: "Line number of the event in its source file."
+        data_tests:
+          - not_null
