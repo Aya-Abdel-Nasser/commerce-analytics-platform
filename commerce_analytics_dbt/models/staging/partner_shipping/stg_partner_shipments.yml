@@ -1,0 +1,61 @@
+
+version: 2
+
+models:
+  - name: stg_partner_shipments
+    description: >
+      Typed and normalized staging model for partner shipping
+      records sourced from Bronze. Each row represents a shipment.
+
+    columns:
+      - name: shipment_id
+        data_type: nvarchar
+        description: "Unique shipment identifier from the shipping partner."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_number
+        data_type: nvarchar
+        description: "External order reference associated with the shipment."
+        data_tests:
+          - not_null
+
+      - name: carrier_code
+        data_type: nvarchar
+        description: "Shipping carrier identifier."
+
+      - name: tracking_number
+        data_type: nvarchar
+        description: "Tracking reference provided by the shipping carrier."
+
+      - name: shipment_status
+        data_type: nvarchar
+        description: "Current shipment lifecycle status."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['DELIVERED', 'IN_TRANSIT', 'DELAYED']
+
+      - name: shipped_at
+        data_type: datetime2
+        description: "Shipment dispatch timestamp converted from raw text."
+        data_tests:
+          - not_null
+
+      - name: delivered_at
+        data_type: datetime2
+        description: "Delivery timestamp, nullable for undelivered shipments."
+
+      - name: shipping_fee_egp
+        data_type: decimal
+        description: "Shipping fee in Egyptian pounds, converted to decimal(18,2)."
+        data_tests:
+          - not_null
+
+      - name: source_updated_at
+        data_type: datetime2
+        description: "Latest update timestamp received from the shipping source."
+        data_tests:
+          - not_null
