@@ -1,0 +1,85 @@
+
+version: 2
+
+models:
+  - name: int_payments_by_order
+    description: >
+      Order-level payment summary aggregated from OLTP payment
+      records. Preserves payment attempt counts by status and
+      calculates successful payment amounts without including
+      failed or pending attempts.
+      Grain: one row per order_id.
+
+    columns:
+      - name: order_id
+        data_type: bigint
+        description: >
+          Unique order identifier and grain of this model.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_orders')
+                field: order_id
+
+      - name: payment_attempt_count
+        data_type: bigint
+        description: >
+          Total number of payment attempts for the order.
+        data_tests:
+          - not_null
+
+      - name: successful_payment_count
+        data_type: bigint
+        description: >
+          Number of payment records with SUCCESS status.
+        data_tests:
+          - not_null
+
+      - name: failed_payment_count
+        data_type: bigint
+        description: >
+          Number of payment records with FAILED status.
+        data_tests:
+          - not_null
+
+      - name: pending_payment_count
+        data_type: bigint
+        description: >
+          Number of payment records with PENDING status.
+        data_tests:
+          - not_null
+
+      - name: successful_payment_amount_egp
+        data_type: decimal
+        description: >
+          Sum of payment amounts with SUCCESS status only,
+          in EGP. Zero when the order has no successful payment.
+          This is not necessarily settled or recognized revenue.
+        data_tests:
+          - not_null
+
+      - name: has_successful_payment
+        data_type: int
+        description: >
+          Binary flag: 1 if the order has at least one
+          successful payment, otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: has_payment_retry
+        data_type: int
+        description: >
+          Binary flag: 1 if the order has more than one
+          payment attempt, otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

@@ -1,0 +1,66 @@
+
+version: 2
+
+models:
+  - name: int_order_items_by_order
+    description: >
+      Order-level summary of OLTP order line items.
+      Aggregates item counts, quantities, gross amounts,
+      discounts, and net amounts.
+      Grain: one row per order_id.
+
+    columns:
+      - name: order_id
+        data_type: bigint
+        description: >
+          Unique order identifier and grain of this model.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_orders')
+                field: order_id
+
+      - name: order_item_count
+        data_type: bigint
+        description: >
+          Number of order line items associated
+          with the order.
+        data_tests:
+          - not_null
+
+      - name: total_quantity
+        data_type: bigint
+        description: >
+          Total quantity of units across all
+          order line items.
+        data_tests:
+          - not_null
+
+      - name: gross_item_amount_egp
+        data_type: decimal
+        description: >
+          Total gross amount before discounts,
+          calculated as the sum of quantity
+          multiplied by unit price, in EGP.
+        data_tests:
+          - not_null
+
+      - name: total_discount_amount_egp
+        data_type: decimal
+        description: >
+          Sum of line-level discount amounts
+          associated with the order, in EGP.
+        data_tests:
+          - not_null
+
+      - name: net_item_amount_egp
+        data_type: decimal
+        description: >
+          Total order item amount after discounts,
+          calculated as gross amount minus
+          total discounts, in EGP.
+          Excludes additional shipping or taxes.
+        data_tests:
+          - not_null
