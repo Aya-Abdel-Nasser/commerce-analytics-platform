@@ -1,0 +1,86 @@
+
+version: 2
+
+models:
+  - name: int_loyalty_transactions_by_account
+    description: >
+      Account-level aggregation of CRM loyalty transactions.
+      Summarizes transaction counts and signed points movements
+      for EARN, REDEEM, and ADJUST transaction types.
+      Grain: one row per loyalty_account_id.
+
+    columns:
+      - name: loyalty_account_id
+        data_type: decimal
+        description: >
+          Unique loyalty account identifier.
+          Primary grain of this model.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_crm_loyalty_accounts')
+                field: loyalty_account_id
+
+      - name: loyalty_transaction_count
+        data_type: bigint
+        description: >
+          Total number of recorded loyalty transactions
+          for this account.
+        data_tests:
+          - not_null
+
+      - name: earn_transaction_count
+        data_type: bigint
+        description: >
+          Number of EARN transactions for this account.
+        data_tests:
+          - not_null
+
+      - name: redeem_transaction_count
+        data_type: bigint
+        description: >
+          Number of REDEEM transactions for this account.
+        data_tests:
+          - not_null
+
+      - name: adjust_transaction_count
+        data_type: bigint
+        description: >
+          Number of ADJUST transactions for this account.
+        data_tests:
+          - not_null
+
+      - name: earned_points
+        data_type: bigint
+        description: >
+          Total points earned from EARN transactions.
+          Recorded as a positive amount.
+        data_tests:
+          - not_null
+
+      - name: redeemed_points
+        data_type: bigint
+        description: >
+          Total points redeemed through REDEEM transactions.
+          Recorded as a positive magnitude.
+        data_tests:
+          - not_null
+
+      - name: net_adjustment_points
+        data_type: bigint
+        description: >
+          Signed net points movement from ADJUST transactions.
+          Can be positive, negative, or zero.
+        data_tests:
+          - not_null
+
+      - name: net_points_delta
+        data_type: bigint
+        description: >
+          Signed sum of all loyalty points movements.
+          Calculated as earned_points minus redeemed_points
+          plus net_adjustment_points.
+        data_tests:
+          - not_null

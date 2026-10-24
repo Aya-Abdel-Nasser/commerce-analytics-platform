@@ -1,0 +1,103 @@
+
+version: 2
+
+models:
+  - name: int_loyalty_accounts_integrated
+    description: >
+      Account-level integration of CRM loyalty accounts
+      and aggregated loyalty transactions.
+      Preserves all loyalty accounts using a LEFT JOIN.
+      Grain: one row per loyalty_account_id.
+
+    columns:
+      - name: loyalty_account_id
+        data_type: decimal
+        description: >
+          Unique loyalty account identifier.
+          Primary grain of the integrated model.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_crm_loyalty_accounts')
+                field: loyalty_account_id
+
+      - name: crm_customer_id
+        data_type: decimal
+        description: >
+          CRM customer identifier associated
+          with this loyalty account.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+      - name: loyalty_tier
+        data_type: nvarchar
+        description: >
+          Loyalty membership tier reported by CRM.
+        data_tests:
+          - not_null
+
+      - name: points_balance
+        data_type: int
+        description: >
+          Current points balance reported by the CRM
+          loyalty account source.
+        data_tests:
+          - not_null
+
+      - name: loyalty_transaction_count
+        data_type: bigint
+        description: >
+          Total number of recorded transactions.
+          NULL when no transaction summary is available.
+
+      - name: earn_transaction_count
+        data_type: bigint
+        description: >
+          Number of EARN transactions.
+          NULL when no transaction summary is available.
+
+      - name: redeem_transaction_count
+        data_type: bigint
+        description: >
+          Number of REDEEM transactions.
+          NULL when no transaction summary is available.
+
+      - name: adjust_transaction_count
+        data_type: bigint
+        description: >
+          Number of ADJUST transactions.
+          NULL when no transaction summary is available.
+
+      - name: earned_points
+        data_type: bigint
+        description: >
+          Total points earned from EARN transactions.
+          Stored as a positive magnitude.
+          NULL when no transaction summary is available.
+
+      - name: redeemed_points
+        data_type: bigint
+        description: >
+          Total points redeemed from REDEEM transactions.
+          Stored as a positive magnitude.
+          NULL when no transaction summary is available.
+
+      - name: net_adjustment_points
+        data_type: bigint
+        description: >
+          Signed sum of ADJUST points movements.
+          NULL when no transaction summary is available.
+
+      - name: net_points_delta
+        data_type: bigint
+        description: >
+          Signed sum of loyalty points movements,
+          calculated from transaction records.
+          Kept separate from the CRM-reported points_balance.
+          NULL when no transaction summary is available.

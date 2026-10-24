@@ -1,0 +1,190 @@
+
+version: 2
+
+models:
+  - name: int_customers_integrated
+    description: >
+      Customer-level integration of OLTP customers,
+      CRM customer attributes, and loyalty account summaries.
+      Uses OLTP customers as the driving relation and LEFT JOINs
+      to preserve customers without CRM or loyalty matches.
+      Customer identity is mapped through customer_code
+      and external_customer_code.
+      Grain: one row per OLTP customer_id.
+
+    columns:
+      - name: customer_id
+        data_type: bigint
+        description: >
+          OLTP customer identifier and unique grain
+          of this integrated model.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_customers')
+                field: customer_id
+
+      - name: customer_code
+        data_type: nvarchar
+        description: >
+          OLTP business customer code used to match
+          customer records across source systems.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: full_name
+        data_type: nvarchar
+        description: >
+          Customer full name from OLTP.
+
+      - name: email
+        data_type: nvarchar
+        description: >
+          Customer email address from OLTP.
+
+      - name: city
+        data_type: nvarchar
+        description: >
+          Customer city from OLTP.
+
+      - name: customer_created_at
+        data_type: datetime2
+        description: >
+          Customer creation timestamp from OLTP.
+
+      - name: oltp_updated_at
+        data_type: datetime2
+        description: >
+          Customer update timestamp from OLTP.
+
+      - name: ingested_at_utc
+        data_type: datetime2
+        description: >
+          UTC ingestion timestamp inherited from
+          OLTP customer staging.
+
+      - name: crm_customer_id
+        data_type: decimal
+        description: >
+          CRM system customer identifier.
+          NULL if the OLTP customer has no CRM match.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+      - name: external_customer_code
+        data_type: nvarchar
+        description: >
+          CRM external customer code matched with
+          the OLTP customer_code business key.
+
+      - name: crm_signup_at
+        data_type: datetime2
+        description: >
+          CRM customer signup timestamp.
+
+      - name: customer_segment
+        data_type: nvarchar
+        description: >
+          Customer segment assigned by CRM.
+
+      - name: marketing_opt_in
+        data_type: smallint
+        description: >
+          Marketing opt-in value reported by CRM.
+
+      - name: preferred_channel
+        data_type: nvarchar
+        description: >
+          Preferred customer communication channel
+          reported by CRM.
+
+      - name: crm_updated_at
+        data_type: datetime2
+        description: >
+          Customer update timestamp from CRM.
+
+      - name: loyalty_account_id
+        data_type: decimal
+        description: >
+          Loyalty account identifier.
+          NULL when the customer has no loyalty account.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_crm_loyalty_accounts')
+                field: loyalty_account_id
+
+      - name: loyalty_tier
+        data_type: nvarchar
+        description: >
+          Loyalty membership tier reported by CRM.
+          NULL for customers without a loyalty account.
+
+      - name: points_balance
+        data_type: int
+        description: >
+          Current loyalty points balance reported by CRM.
+          NULL for customers without a loyalty account.
+
+      - name: has_loyalty_account
+        data_type: int
+        description: >
+          1 if the customer has a loyalty account,
+          otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: loyalty_transaction_count
+        data_type: bigint
+        description: >
+          Number of loyalty transactions.
+          NULL when no loyalty transaction summary is joined.
+
+      - name: earn_transaction_count
+        data_type: bigint
+        description: >
+          Number of EARN loyalty transactions.
+
+      - name: redeem_transaction_count
+        data_type: bigint
+        description: >
+          Number of REDEEM loyalty transactions.
+
+      - name: adjust_transaction_count
+        data_type: bigint
+        description: >
+          Number of ADJUST loyalty transactions.
+
+      - name: earned_points
+        data_type: bigint
+        description: >
+          Total earned loyalty points,
+          represented as a positive magnitude.
+
+      - name: redeemed_points
+        data_type: bigint
+        description: >
+          Total redeemed loyalty points,
+          represented as a positive magnitude.
+
+      - name: net_adjustment_points
+        data_type: bigint
+        description: >
+          Signed total of loyalty points adjustments.
+
+      - name: net_points_delta
+        data_type: bigint
+        description: >
+          Signed net movement of loyalty points,
+          calculated from loyalty transactions.
+          Kept separate from CRM-reported points_balance.
