@@ -1,0 +1,138 @@
+
+version: 2
+
+models:
+  - name: int_orders_integrated
+    description: >
+      Order-level integration of OLTP order attributes,
+      aggregated order items, and aggregated payment attempts.
+      Uses the orders staging model as the driving relation
+      with LEFT JOINs to preserve orders even when related
+      item or payment summaries are unavailable.
+      Grain: one row per order_id.
+
+    columns:
+      - name: order_id
+        data_type: bigint
+        description: >
+          Unique order identifier. Primary grain of
+          the integrated model.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_orders')
+                field: order_id
+
+      - name: order_number
+        data_type: nvarchar
+        description: >
+          Business-facing order reference inherited
+          from the OLTP orders staging model.
+
+      - name: customer_id
+        data_type: bigint
+        description: >
+          Customer identifier associated with the order.
+
+      - name: order_status
+        data_type: nvarchar
+        description: >
+          Current order status inherited from staging.
+
+      - name: sales_channel
+        data_type: nvarchar
+        description: >
+          Channel through which the order was placed.
+
+      - name: order_date
+        data_type: datetime2
+        description: >
+          Date and time when the order was placed.
+
+      - name: updated_at
+        data_type: datetime2
+        description: >
+          Latest order update timestamp provided by staging.
+
+      - name: order_item_count
+        data_type: bigint
+        description: >
+          Number of line items in the order.
+          NULL when no item summary is joined.
+
+      - name: total_quantity
+        data_type: bigint
+        description: >
+          Total number of units ordered.
+          NULL when no item summary is joined.
+
+      - name: gross_item_amount_egp
+        data_type: decimal
+        description: >
+          Gross order item amount before discounts, in EGP.
+          NULL when no item summary is joined.
+
+      - name: total_discount_amount_egp
+        data_type: decimal
+        description: >
+          Total line-item discounts in EGP.
+          NULL when no item summary is joined.
+
+      - name: net_item_amount_egp
+        data_type: decimal
+        description: >
+          Gross order item amount minus line-item discounts
+          in EGP. This is not necessarily recognized revenue.
+          NULL when no item summary is joined.
+
+      - name: payment_attempt_count
+        data_type: bigint
+        description: >
+          Number of recorded payment attempts for the order.
+          NULL when no payment summary is joined.
+
+      - name: successful_payment_count
+        data_type: bigint
+        description: >
+          Number of payment attempts with SUCCESS status.
+
+      - name: failed_payment_count
+        data_type: bigint
+        description: >
+          Number of payment attempts with FAILED status.
+
+      - name: pending_payment_count
+        data_type: bigint
+        description: >
+          Number of payment attempts with PENDING status.
+
+      - name: successful_payment_amount_egp
+        data_type: decimal
+        description: >
+          Sum of successful payment amounts in EGP.
+          Does not by itself represent recognized revenue.
+          NULL when no payment summary is joined.
+
+      - name: has_successful_payment
+        data_type: int
+        description: >
+          1 if the order has at least one successful payment,
+          0 otherwise. NULL if the payment summary is missing.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: has_payment_retry
+        data_type: int
+        description: >
+          1 if the order has more than one payment attempt,
+          0 otherwise. NULL if the payment summary is missing.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
