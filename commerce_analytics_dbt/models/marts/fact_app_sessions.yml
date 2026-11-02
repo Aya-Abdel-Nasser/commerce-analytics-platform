@@ -1,0 +1,180 @@
+
+version: 2
+
+models:
+  - name: fact_app_sessions
+
+    description: >
+      Gold application session-level fact table.
+
+      Grain: one row per session_id.
+
+      Aggregates validated application events into
+      one record per observed session.
+
+      Event-type measures count recorded events,
+      not independently verified business conversions.
+
+      Session duration measures the elapsed time
+      between the first and last observed events.
+      It does not represent confirmed active user time.
+
+      Session timestamps use UTC.
+
+      Anonymous sessions retain NULL customer_id.
+      Customer attributes are resolved using the
+      current customer dimension, not historical
+      SCD Type 2 versions.
+
+    columns:
+
+      - name: session_id
+        description: >
+          Unique application session identifier.
+          Defines the grain of the fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: channel
+        description: >
+          Application channel associated with the session.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - WEB
+                  - MOBILE
+
+      - name: customer_code
+        description: >
+          Source customer code for identified sessions.
+          NULL for anonymous sessions.
+
+      - name: anonymous_id
+        description: >
+          Anonymous visitor identifier.
+          NULL for identified sessions.
+
+      - name: customer_id
+        description: >
+          Stable customer identifier from the current
+          Gold customer dimension.
+
+          NULL for anonymous sessions.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+      - name: session_started_at_utc
+        description: >
+          Timestamp of the recorded session_started event.
+        data_tests:
+          - not_null
+
+      - name: first_event_at_utc
+        description: >
+          Earliest observed event timestamp in the session.
+        data_tests:
+          - not_null
+
+      - name: last_event_at_utc
+        description: >
+          Latest observed event timestamp in the session.
+        data_tests:
+          - not_null
+
+      - name: session_date_key
+        description: >
+          UTC calendar date derived from
+          session_started_at_utc in YYYYMMDD format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: observed_session_duration_seconds
+        description: >
+          Elapsed seconds between first and last
+          observed events in the session.
+
+          Not confirmed active user time.
+        data_tests:
+          - not_null
+
+      - name: session_count
+        description: >
+          Additive measure equal to one per session.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: event_count
+        description: >
+          Total number of recorded events in the session.
+        data_tests:
+          - not_null
+
+      - name: session_started_event_count
+        description: >
+          Number of session_started events.
+          Exactly one is expected per session.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: product_view_event_count
+        description: >
+          Number of product_viewed events in the session.
+        data_tests:
+          - not_null
+
+      - name: add_to_cart_event_count
+        description: >
+          Number of added_to_cart events in the session.
+        data_tests:
+          - not_null
+
+      - name: checkout_started_event_count
+        description: >
+          Number of checkout_started events.
+        data_tests:
+          - not_null
+
+      - name: order_submitted_event_count
+        description: >
+          Number of order_submitted events.
+          Not a verified count of completed orders.
+        data_tests:
+          - not_null
+
+      - name: payment_submitted_event_count
+        description: >
+          Number of payment_submitted events.
+          Not proof of successful payment settlement.
+        data_tests:
+          - not_null
+
+      - name: purchase_completed_event_count
+        description: >
+          Number of application purchase_completed events.
+          Not independently verified purchase conversions.
+        data_tests:
+          - not_null
+
+      - name: checkout_cancelled_event_count
+        description: >
+          Number of checkout_cancelled events.
+        data_tests:
+          - not_null

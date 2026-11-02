@@ -2,56 +2,223 @@
 version: 2
 
 sources:
+
   - name: postgres_oltp
     schema: bronze
     tables:
       - name: oltp_orders
+        description: >
+          Order records ingested from the PostgreSQL OLTP
+          system into the Bronze layer.
+        columns:
+          - name: order_id
+            description: "Source identifier for an order."
+          - name: order_number
+            description: "Business-facing order reference."
+          - name: customer_id
+            description: "Customer identifier referenced by the order."
+          - name: _ingested_at_utc
+            description: "UTC timestamp associated with ingestion into Bronze."
+
       - name: oltp_order_items
+        description: >
+          Order line-item records ingested from the
+          PostgreSQL OLTP system into the Bronze layer.
+        columns:
+          - name: order_item_id
+            description: "Source identifier for an order line item."
+          - name: order_id
+            description: "Identifier of the related order."
+          - name: product_id
+            description: "Identifier of the referenced product."
 
       - name: oltp_customers
-        description: "Validated PostgreSQL OLTP customer snapshot in Bronze."
+        description: >
+          Validated PostgreSQL OLTP customer snapshot
+          in the Bronze layer.
         columns:
           - name: customer_id
             description: "Source primary key."
             data_tests:
               - not_null
               - unique
+          - name: customer_code
+            description: "Customer business identifier used for integration."
+          - name: _ingested_at_utc
+            description: "UTC timestamp associated with ingestion into Bronze."
 
       - name: oltp_products
+        description: >
+          Product records ingested from the PostgreSQL
+          OLTP system into the Bronze layer.
+        columns:
+          - name: product_id
+            description: "Source identifier for a product."
+          - name: sku
+            description: "Stock Keeping Unit used as a product reference."
+          - name: _ingested_at_utc
+            description: "UTC timestamp associated with ingestion into Bronze."
+
       - name: oltp_payments
+        description: >
+          Payment records ingested from the PostgreSQL
+          OLTP system into the Bronze layer.
+        columns:
+          - name: payment_id
+            description: "Source identifier for a payment record."
+          - name: order_id
+            description: "Identifier of the related order."
+          - name: transaction_id
+            description: "Transaction reference associated with the payment."
+
+
 
   - name: mysql_crm
     schema: bronze
     tables:
       - name: crm_customers
-      - name: crm_loyalty_accounts
-      - name: crm_loyalty_transactions
-      - name: crm_campaigns
+        description: >
+          Customer records ingested from the MySQL CRM
+          system into the Bronze layer.
+        columns:
+          - name: crm_customer_id
+            description: "Customer identifier in the CRM system."
+          - name: external_customer_code
+            description: >
+              Customer reference used to associate CRM
+              records with external customer data.
+          - name: updated_at
+            description: "Source-record update timestamp."
 
+      - name: crm_loyalty_accounts
+        description: >
+          Customer loyalty account records ingested
+          from the MySQL CRM system into the Bronze layer.
+        columns:
+          - name: loyalty_account_id
+            description: "Identifier of the loyalty account."
+          - name: crm_customer_id
+            description: "Identifier of the related CRM customer."
+          - name: points_balance
+            description: "Recorded loyalty points balance."
+
+      - name: crm_loyalty_transactions
+        description: >
+          Loyalty transaction records ingested from
+          the MySQL CRM system into the Bronze layer.
+        columns:
+          - name: loyalty_transaction_id
+            description: "Identifier of the loyalty transaction."
+          - name: loyalty_account_id
+            description: "Identifier of the related loyalty account."
+          - name: reference_order_number
+            description: "Order reference associated with the transaction."
+
+      - name: crm_campaigns
+        description: >
+          Marketing campaign records ingested from
+          the MySQL CRM system into the Bronze layer.
+        columns:
+          - name: campaign_id
+            description: "Identifier of the marketing campaign."
+          - name: campaign_code
+            description: "Business reference for the campaign."
+          - name: campaign_status
+            description: "Status recorded for the campaign."
 
       - name: crm_campaign_memberships
-        description: "CRM campaign memberships from the validated Bronze snapshot."
+        description: >
+          CRM campaign memberships from the validated
+          Bronze snapshot.
         data_tests:
           - dbt_utils.unique_combination_of_columns:
               arguments:
                 combination_of_columns:
                   - campaign_id
                   - crm_customer_id
-
+        columns:
+          - name: campaign_id
+            description: "Identifier of the related campaign."
+          - name: crm_customer_id
+            description: "Identifier of the related CRM customer."
+          - name: engagement_status
+            description: >
+              Current engagement status recorded for
+              the customer within the campaign.
 
       - name: crm_support_tickets
+        description: >
+          Customer support ticket records ingested
+          from the MySQL CRM system into the Bronze layer.
+        columns:
+          - name: ticket_id
+            description: "Identifier of the support ticket."
+          - name: crm_customer_id
+            description: "Identifier of the customer associated with the ticket."
+          - name: ticket_status
+            description: "Current status recorded for the support ticket."
+
+
 
   - name: partner_shipping
     schema: bronze
     tables:
       - name: partner_shipments
+        description: >
+          Shipment records received from partner CSV
+          files and loaded into the Bronze layer.
+        columns:
+          - name: shipment_id
+            description: "Source identifier for a shipment."
+          - name: order_number
+            description: >
+              Order business reference associated with
+              the shipment.
+          - name: shipment_status
+            description: "Shipment status reported by the partner."
+          - name: source_updated_at
+            description: >
+              Timestamp of the shipment record update
+              reported by the source.
 
   - name: returns_api
     schema: bronze
     tables:
       - name: returns_raw
+        description: >
+          Raw returns data received from the Returns API
+          JSONL ingestion process and stored in Bronze.
+        columns:
+          - name: raw_json
+            description: >
+              Raw JSON payload containing the
+              return record.
+          - name: source_file_name
+            description: >
+              Name of the source file from which
+              the record was ingested.
+          - name: source_line_number
+            description: >
+              Line number of the record within
+              its source file.
 
   - name: application_events
     schema: bronze
     tables:
       - name: app_events_raw
+        description: >
+          Raw application event records loaded from
+          JSONL event files into the Bronze layer.
+        columns:
+          - name: raw_json
+            description: >
+              Raw JSON payload containing the
+              application event.
+          - name: source_file_name
+            description: >
+              Name of the source event file
+              from which the record was ingested.
+          - name: source_line_number
+            description: >
+              Line number of the event record
+              within its source file.

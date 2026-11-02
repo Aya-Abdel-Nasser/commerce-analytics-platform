@@ -1,0 +1,116 @@
+
+version: 2
+
+models:
+  - name: fact_order_items
+
+    description: >
+      Gold order-item-level fact table.
+
+      Grain: one row per order_item_id.
+
+      Contains transaction-level product quantities,
+      unit prices, discounts, and calculated gross
+      and net merchandise amounts in EGP.
+
+      Order and date attributes are obtained from
+      fact_orders. Product attributes are available
+      through dim_products.
+
+    columns:
+
+      - name: order_item_id
+        description: >
+          Unique OLTP order item identifier.
+          Defines the grain of this fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: >
+          Parent order identifier.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+      - name: product_id
+        description: >
+          Product identifier associated with
+          the order item.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+
+      - name: customer_id
+        description: >
+          Stable customer identifier inherited
+          from the parent order.
+          Does not identify an SCD historical version.
+        data_tests:
+          - not_null
+
+      - name: order_date_key
+        description: >
+          Order date key in YYYYMMDD format,
+          inherited from fact_orders.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: order_item_count
+        description: >
+          Additive measure equal to 1
+          for every order item.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: quantity
+        description: >
+          Number of units recorded in
+          this order item.
+        data_tests:
+          - not_null
+
+      - name: unit_price_egp
+        description: >
+          Transaction unit price in EGP.
+          Not necessarily the current catalog price.
+        data_tests:
+          - not_null
+
+      - name: discount_amount_egp
+        description: >
+          Total discount recorded for this
+          order item, in EGP.
+        data_tests:
+          - not_null
+
+      - name: gross_item_amount_egp
+        description: >
+          Gross merchandise amount calculated as
+          quantity multiplied by unit_price_egp.
+        data_tests:
+          - not_null
+
+      - name: net_item_amount_egp
+        description: >
+          Net merchandise amount calculated as
+          gross_item_amount_egp minus
+          discount_amount_egp.
+          Not automatically recognized revenue.
+        data_tests:
+          - not_null

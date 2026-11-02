@@ -1,0 +1,29 @@
+
+version: 2
+
+snapshots:
+  - name: snap_customers
+
+    description: >
+      Historical customer attribute changes captured
+      using dbt Snapshot Check Strategy.
+      One row per observed customer version.
+
+    relation: ref('int_customers_scd_source')
+
+    config:
+      schema: snapshots
+
+      unique_key: customer_id
+
+      strategy: check
+
+      check_cols:
+        - city
+        - customer_segment
+        - preferred_channel
+        - marketing_opt_in
+        - loyalty_tier
+        - has_loyalty_account
+
+      hard_deletes: ignore

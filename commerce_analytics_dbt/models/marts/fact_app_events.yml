@@ -1,0 +1,216 @@
+
+version: 2
+
+models:
+  - name: fact_app_events
+
+    description: >
+      Gold application event-level fact table.
+
+      Grain: one row per event_id.
+
+      Contains all application events, including
+      identified and anonymous user events.
+
+      Customer, order, and product relationships
+      are nullable when the source reference
+      is not applicable.
+
+      Event and receipt timestamps are represented
+      as UTC datetimeoffset values.
+
+      receive_delay_seconds measures elapsed time
+      between event occurrence and source-reported
+      receipt, not warehouse ingestion latency.
+
+      Application event names are not independent
+      proof of completed orders, payments, or revenue.
+
+      The model currently uses full-table
+      materialization. Incremental late-arrival
+      handling has not yet been implemented.
+
+    columns:
+
+      - name: event_id
+        description: >
+          Unique source event identifier.
+          Defines the grain of the fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: event_name
+        description: >
+          Type of application event.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - session_started
+                  - product_viewed
+                  - added_to_cart
+                  - checkout_started
+                  - order_submitted
+                  - purchase_completed
+                  - payment_submitted
+                  - checkout_cancelled
+
+      - name: session_id
+        description: >
+          Source session identifier linking
+          related application events.
+        data_tests:
+          - not_null
+
+      - name: channel
+        description: >
+          Application channel used for the event.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - WEB
+                  - MOBILE
+
+      - name: customer_code
+        description: >
+          Original source customer code for
+          identified events.
+
+          NULL for anonymous events.
+
+      - name: anonymous_id
+        description: >
+          Anonymous user identifier.
+
+          NULL for identified events.
+
+      - name: customer_id
+        description: >
+          Stable customer identifier resolved
+          through the current customer dimension.
+
+          NULL for anonymous events.
+
+          Not an SCD Type 2 customer version key.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+      - name: order_number
+        description: >
+          Optional source order reference.
+
+          Does not independently verify order
+          completion or successful payment.
+
+      - name: order_id
+        description: >
+          Nullable order identifier resolved
+          through the Gold orders fact.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+      - name: product_sku
+        description: >
+          Optional product reference supplied
+          by the application event.
+
+      - name: product_id
+        description: >
+          Nullable product identifier resolved
+          through the Gold product dimension.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+
+      - name: event_time_utc
+        description: >
+          Source-reported event occurrence
+          timestamp, represented in UTC.
+        data_tests:
+          - not_null
+
+      - name: event_date_key
+        description: >
+          UTC calendar date derived from
+          event_time_utc in YYYYMMDD format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: received_at_utc
+        description: >
+          Source-reported event receipt
+          timestamp, represented in UTC.
+
+          Not the SQL Server load timestamp.
+        data_tests:
+          - not_null
+
+      - name: received_date_key
+        description: >
+          UTC calendar date derived from
+          received_at_utc in YYYYMMDD format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: event_count
+        description: >
+          Additive measure equal to one
+          for each application event.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: receive_delay_seconds
+        description: >
+          Source-reported receipt delay
+          calculated using DATEDIFF_BIG.
+
+          Observed source delays range
+          from 2 to 172800 seconds.
+
+          Not warehouse ingestion latency.
+        data_tests:
+          - not_null
+
+      - name: source_system
+        description: >
+          Source system extracted from
+          the JSON envelope.
+
+      - name: source_batch
+        description: >
+          Source batch identifier extracted
+          from the JSON envelope.
+
+      - name: source_file_name
+        description: >
+          Original JSONL source file name
+          retained for data lineage.
+
+      - name: source_line_number
+        description: >
+          Original line number within
+          the source JSONL file.

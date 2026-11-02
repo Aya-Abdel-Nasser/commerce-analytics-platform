@@ -1,0 +1,150 @@
+
+version: 2
+
+models:
+  - name: fact_loyalty_transactions
+
+    description: >
+      Gold transaction-level loyalty fact table.
+
+      Grain: one row per loyalty_transaction_id.
+
+      Contains signed points movements and separate
+      measures for earned, redeemed, and adjusted points.
+
+      Links transactions to current loyalty accounts
+      and stable customer identifiers.
+
+      Order references are optional.
+
+      Transaction dates use source calendar dates.
+      The source timezone has not been independently
+      verified.
+
+      Historical customer loyalty tiers are not
+      assigned to individual transactions.
+
+    columns:
+
+      - name: loyalty_transaction_id
+        description: >
+          Unique loyalty transaction identifier.
+          Defines the grain of the fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: loyalty_account_id
+        description: >
+          Loyalty account associated with the
+          points movement.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_loyalty_accounts')
+                field: loyalty_account_id
+
+      - name: customer_id
+        description: >
+          Stable OLTP customer identifier derived
+          from the current loyalty account dimension.
+
+          Not an SCD Type 2 historical version key.
+        data_tests:
+          - not_null
+
+      - name: reference_order_number
+        description: >
+          Optional order number supplied by CRM.
+
+          NULL when the transaction has no order
+          reference.
+
+      - name: order_id
+        description: >
+          Optional OLTP order identifier resolved
+          through reference_order_number.
+
+          NULL for transactions without a matching
+          order reference.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+      - name: transaction_type
+        description: >
+          Type of loyalty points movement.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - EARN
+                  - REDEEM
+                  - ADJUST
+
+      - name: occurred_at
+        description: >
+          Source timestamp of the loyalty transaction.
+          Timezone has not been independently verified.
+        data_tests:
+          - not_null
+
+      - name: transaction_date_key
+        description: >
+          Source calendar date derived from occurred_at.
+          Uses YYYYMMDD integer format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: transaction_count
+        description: >
+          Additive measure equal to 1
+          for each loyalty transaction.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: points_delta
+        description: >
+          Original signed points movement.
+
+          Positive values increase points.
+          Negative values decrease points.
+        data_tests:
+          - not_null
+
+      - name: earned_points
+        description: >
+          Positive points earned through EARN
+          transactions. Zero for other types.
+        data_tests:
+          - not_null
+
+      - name: redeemed_points
+        description: >
+          Positive magnitude of points redeemed
+          through REDEEM transactions.
+
+          Zero for other types.
+        data_tests:
+          - not_null
+
+      - name: adjustment_points
+        description: >
+          Signed points movement from ADJUST
+          transactions. Zero for other types.
+
+          May be positive or negative.
+        data_tests:
+          - not_null

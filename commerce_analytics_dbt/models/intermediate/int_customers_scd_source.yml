@@ -1,0 +1,78 @@
+
+version: 2
+
+models:
+  - name: int_customers_scd_source
+    description: >
+      Current-state customer attributes prepared for
+      dbt SCD Type 2 snapshot change detection.
+
+      Grain: one row per customer_id.
+
+      This model does not store historical versions.
+      Historical changes are captured by the
+      downstream dbt snapshot.
+
+    columns:
+      - name: customer_id
+        description: >
+          Stable OLTP customer identifier used as
+          the snapshot unique_key.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('int_customers_integrated')
+                field: customer_id
+
+      - name: customer_code
+        description: >
+          Unique business-facing customer identifier.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_created_at
+        description: >
+          Customer creation timestamp from OLTP.
+          Retained for customer lifecycle analysis.
+
+      - name: crm_signup_at
+        description: >
+          CRM signup timestamp.
+          May be NULL when no CRM match exists.
+
+      - name: city
+        description: >
+          Customer city tracked for historical changes.
+
+      - name: customer_segment
+        description: >
+          CRM customer segment tracked for SCD Type 2.
+
+      - name: preferred_channel
+        description: >
+          Preferred communication channel tracked
+          for historical changes.
+
+      - name: marketing_opt_in
+        description: >
+          Marketing opt-in state reported by CRM.
+          Tracked for historical changes.
+
+      - name: loyalty_tier
+        description: >
+          Customer loyalty tier.
+          May be NULL for customers without loyalty.
+
+      - name: has_loyalty_account
+        description: >
+          1 if the customer has a loyalty account,
+          otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

@@ -1,0 +1,170 @@
+
+version: 2
+
+models:
+  - name: fact_campaign_memberships
+
+    description: >
+      Gold current-state campaign membership fact table.
+
+      Grain: one row per campaign_id and crm_customer_id.
+
+      Each row represents the latest loaded CRM
+      engagement status of a customer within a campaign.
+
+      Status indicators represent mutually exclusive
+      current states, not historical funnel events.
+
+      CONVERTED is a CRM-reported status and does not
+      establish a verified purchase or attributed revenue.
+
+      Date keys use source calendar dates.
+      The source timezone is not independently verified.
+
+    columns:
+
+      - name: campaign_id
+        description: >
+          Campaign identifier forming part of
+          the composite business key.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_campaigns')
+                field: campaign_id
+
+      - name: crm_customer_id
+        description: >
+          CRM customer identifier forming part
+          of the composite business key.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+      - name: customer_id
+        description: >
+          Stable OLTP customer identifier resolved
+          through the current customer dimension.
+
+          Not an SCD Type 2 customer version key.
+        data_tests:
+          - not_null
+
+      - name: engagement_status
+        description: >
+          Latest loaded CRM engagement status
+          for this customer-campaign membership.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - TARGETED
+                  - SENT
+                  - OPENED
+                  - CONVERTED
+
+      - name: targeted_at
+        description: >
+          Timestamp when the customer was targeted
+          for the campaign.
+        data_tests:
+          - not_null
+
+      - name: targeted_date_key
+        description: >
+          Calendar date key derived from targeted_at
+          using YYYYMMDD integer format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: engaged_at
+        description: >
+          Engagement timestamp supplied by CRM.
+
+          NULL is valid for TARGETED memberships.
+          The meaning of this timestamp depends
+          on the CRM engagement status.
+
+      - name: engaged_date_key
+        description: >
+          Nullable calendar date key derived
+          from engaged_at when available.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: membership_updated_at
+        description: >
+          Last membership update timestamp
+          supplied by CRM.
+        data_tests:
+          - not_null
+
+      - name: membership_count
+        description: >
+          Additive measure equal to one
+          for each campaign membership.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: targeted_status_count
+        description: >
+          Equals one when the current engagement
+          status is TARGETED, otherwise zero.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: sent_status_count
+        description: >
+          Equals one when the current engagement
+          status is SENT, otherwise zero.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: opened_status_count
+        description: >
+          Equals one when the current engagement
+          status is OPENED, otherwise zero.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: converted_status_count
+        description: >
+          Equals one when the current engagement
+          status is CONVERTED, otherwise zero.
+
+          This indicates a CRM-reported conversion,
+          not a verified order conversion.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

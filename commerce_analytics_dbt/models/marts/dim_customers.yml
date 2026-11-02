@@ -1,0 +1,111 @@
+
+version: 2
+
+models:
+  - name: dim_customers
+
+    description: >
+      Gold customer dimension implementing SCD Type 2.
+
+      Grain: one row per observed customer version.
+
+      Historical attributes are sourced from the
+      persisted customer snapshot.
+
+      Validity timestamps represent snapshot-observed
+      changes, not necessarily original source event times.
+
+    columns:
+      - name: customer_version_key
+        description: >
+          Unique surrogate identifier for each
+          observed customer version.
+          Derived from snapshot dbt_scd_id.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('snap_customers')
+                field: dbt_scd_id
+
+      - name: customer_id
+        description: >
+          Stable OLTP customer identifier.
+          Can repeat across historical versions.
+        data_tests:
+          - not_null
+
+      - name: customer_code
+        description: >
+          Business-facing customer identifier.
+        data_tests:
+          - not_null
+
+      - name: customer_created_at
+        description: >
+          Original customer creation timestamp.
+          Not used as an SCD validity timestamp.
+
+      - name: crm_signup_at
+        description: >
+          Customer signup timestamp in CRM.
+          May be NULL.
+
+      - name: city
+        description: >
+          Historically tracked customer city.
+
+      - name: customer_segment
+        description: >
+          Historically tracked CRM customer segment.
+
+      - name: preferred_channel
+        description: >
+          Historically tracked customer
+          communication preference.
+
+      - name: marketing_opt_in
+        description: >
+          Historically tracked marketing opt-in state.
+
+      - name: loyalty_tier
+        description: >
+          Historically tracked loyalty tier.
+          May be NULL for customers without loyalty.
+
+      - name: has_loyalty_account
+        description: >
+          Historically tracked loyalty account flag.
+          1 means the customer has a loyalty account.
+          0 means no loyalty account.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: valid_from_at
+        description: >
+          Start of the observed validity interval.
+          Inclusive.
+        data_tests:
+          - not_null
+
+      - name: valid_to_at
+        description: >
+          End of the observed validity interval.
+          Exclusive.
+          NULL indicates the current version.
+
+      - name: is_current
+        description: >
+          1 for the current customer version.
+          0 for historical versions.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

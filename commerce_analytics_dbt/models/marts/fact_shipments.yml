@@ -1,0 +1,181 @@
+
+version: 2
+
+models:
+  - name: fact_shipments
+
+    description: >
+      Gold shipment-level fact table for delivery analytics.
+
+      Grain: one row per shipment_id.
+
+      Combines partner shipping records with order
+      identifiers from fact_orders.
+
+      Delivery duration is measured in seconds and
+      is available only for delivered shipments.
+
+      Shipping fees are denominated in EGP.
+
+      DELAYED is a source-reported shipment status,
+      not a calculated SLA violation.
+
+    columns:
+
+      - name: shipment_id
+        description: >
+          Unique shipment identifier from the partner source.
+          Defines the grain of this fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: tracking_number
+        description: >
+          Shipment tracking identifier.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: >
+          Parent OLTP order identifier obtained
+          by matching order_number with fact_orders.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+      - name: order_number
+        description: >
+          Business-facing order identifier
+          provided by the shipping partner.
+        data_tests:
+          - not_null
+
+      - name: customer_id
+        description: >
+          Stable customer identifier inherited
+          from the related order.
+        data_tests:
+          - not_null
+
+      - name: order_date_key
+        description: >
+          Order date key inherited from fact_orders.
+          Uses YYYYMMDD format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: carrier_code
+        description: >
+          Shipping carrier identifier.
+        data_tests:
+          - not_null
+
+      - name: shipment_status
+        description: >
+          Latest loaded shipment lifecycle status.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - DELIVERED
+                  - IN_TRANSIT
+                  - DELAYED
+
+      - name: shipped_at
+        description: >
+          Shipment dispatch timestamp from
+          the partner source.
+        data_tests:
+          - not_null
+
+      - name: delivered_at
+        description: >
+          Actual delivery timestamp.
+          NULL for shipments not yet delivered.
+
+      - name: source_updated_at
+        description: >
+          Last update timestamp supplied by
+          the shipping partner.
+
+      - name: shipped_date_key
+        description: >
+          Date dimension key derived from shipped_at.
+          Uses YYYYMMDD format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: delivered_date_key
+        description: >
+          Date dimension key derived from delivered_at.
+          NULL for undelivered shipments.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: shipment_count
+        description: >
+          Additive measure equal to 1
+          for each shipment record.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: shipping_fee_egp
+        description: >
+          Shipping fee reported by the partner,
+          denominated in EGP.
+          Not automatically recognized as revenue or cost.
+        data_tests:
+          - not_null
+
+      - name: delivery_duration_seconds
+        description: >
+          Elapsed time between shipped_at and delivered_at,
+          measured in seconds.
+
+          NULL when the shipment is not delivered.
+          Does not represent an SLA measurement.
+
+      - name: is_delivered
+        description: >
+          1 when shipment_status is DELIVERED,
+          otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: is_currently_delayed
+        description: >
+          1 when the latest loaded shipment status
+          is DELAYED, otherwise 0.
+
+          Represents source status, not live tracking.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

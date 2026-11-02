@@ -1,0 +1,105 @@
+
+version: 2
+
+models:
+  - name: dim_campaigns
+
+    description: >
+      Gold current-state campaign dimension.
+
+      Grain: one row per campaign_id.
+
+      Implements SCD Type 1. Campaign attributes
+      reflect the latest loaded CRM source state.
+
+      Includes all campaigns, even DRAFT campaigns
+      without customer memberships.
+
+      Campaign start and end date keys are derived
+      from source calendar dates. The source timezone
+      has not been independently verified.
+
+    columns:
+
+      - name: campaign_id
+        description: >
+          Unique CRM campaign identifier.
+          Defines the grain of the dimension.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_code
+        description: >
+          Business-facing campaign code
+          provided by the CRM source.
+
+      - name: campaign_name
+        description: >
+          Descriptive name of the campaign.
+
+      - name: channel
+        description: >
+          Marketing delivery channel.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - EMAIL
+                  - PUSH
+                  - SMS
+
+      - name: campaign_status
+        description: >
+          Current campaign lifecycle status.
+          Historical status changes are not
+          preserved in this dimension.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - DRAFT
+                  - ACTIVE
+                  - COMPLETED
+
+      - name: starts_at
+        description: >
+          Campaign start timestamp from CRM.
+        data_tests:
+          - not_null
+
+      - name: start_date_key
+        description: >
+          Calendar date key derived from starts_at
+          in YYYYMMDD integer format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: ends_at
+        description: >
+          Campaign end timestamp from CRM.
+        data_tests:
+          - not_null
+
+      - name: end_date_key
+        description: >
+          Calendar date key derived from ends_at
+          in YYYYMMDD integer format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: campaign_updated_at
+        description: >
+          Last update timestamp from the CRM source.
+        data_tests:
+          - not_null

@@ -1,0 +1,184 @@
+
+version: 2
+
+models:
+  - name: fact_returns
+
+    description: >
+      Gold return-level fact table for commerce analytics.
+
+      Grain: one row per return_id.
+
+      Contains return requests parsed from the Returns API,
+      linked to their parent orders.
+
+      Return date keys are derived using UTC calendar dates.
+
+      requested_refund_egp represents the requested refund
+      amount, not confirmed actual refund payout.
+
+      Return status reflects the latest loaded source state.
+      Historical status transitions are not preserved.
+
+    columns:
+
+      - name: return_id
+        description: >
+          Unique return identifier supplied by the API.
+          Defines the grain of this fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: >
+          Parent OLTP order identifier obtained through
+          the order_number relationship.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+      - name: order_number
+        description: >
+          Business-facing order reference supplied
+          by the Returns API.
+        data_tests:
+          - not_null
+
+      - name: customer_id
+        description: >
+          Stable customer identifier inherited
+          from fact_orders.
+          Does not identify an historical SCD version.
+        data_tests:
+          - not_null
+
+      - name: order_date_key
+        description: >
+          Order date key inherited from fact_orders.
+          Uses the order's existing date policy.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: reason_code
+        description: >
+          Reason reported for the return request.
+        data_tests:
+          - not_null
+
+      - name: return_status
+        description: >
+          Latest loaded return lifecycle status.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - REQUESTED
+                  - APPROVED
+                  - REJECTED
+                  - REFUNDED
+
+      - name: requested_at
+        description: >
+          Return request timestamp preserved
+          as datetimeoffset.
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: >
+          Return last update timestamp preserved
+          as datetimeoffset.
+        data_tests:
+          - not_null
+
+      - name: requested_date_key
+        description: >
+          UTC calendar date key derived from requested_at.
+          Uses YYYYMMDD integer format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: updated_date_key
+        description: >
+          UTC calendar date key derived from updated_at.
+          Uses YYYYMMDD integer format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: return_count
+        description: >
+          Additive measure equal to 1
+          for each return record.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: requested_refund_egp
+        description: >
+          Requested refund amount in EGP.
+          Not necessarily the actual refunded amount.
+        data_tests:
+          - not_null
+
+      - name: is_refunded_status
+        description: >
+          1 when return_status is REFUNDED,
+          otherwise 0.
+          Does not independently verify refund settlement.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: is_approved_status
+        description: >
+          1 when return_status is APPROVED,
+          otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: source_system
+        description: >
+          Source system identified in the API metadata.
+
+      - name: source_endpoint
+        description: >
+          API endpoint recorded in the source metadata.
+
+      - name: ingested_at_utc
+        description: >
+          Ingestion timestamp extracted from source JSON.
+
+      - name: source_file_name
+        description: >
+          Source file containing the raw return record.
+
+      - name: source_line_number
+        description: >
+          Original line number within the source file.
