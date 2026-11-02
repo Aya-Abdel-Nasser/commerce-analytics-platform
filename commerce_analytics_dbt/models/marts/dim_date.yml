@@ -1,0 +1,103 @@
+
+version: 2
+
+models:
+  - name: dim_date
+    description: >
+      Conformed calendar date dimension for the Gold
+      analytics layer.
+      Grain: one row per calendar date.
+      Covers 2025-01-01 through 2027-12-31.
+      Independent of source transaction activity.
+
+    columns:
+      - name: date_key
+        data_type: int
+        description: >
+          Unique calendar date key in YYYYMMDD format.
+          Primary grain identifier.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: full_date
+        data_type: date
+        description: >
+          Actual calendar date corresponding to date_key.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: year_number
+        data_type: int
+        description: >
+          Calendar year of full_date.
+        data_tests:
+          - not_null
+
+      - name: quarter_number
+        data_type: int
+        description: >
+          Calendar quarter from 1 through 4.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+                quote: false
+
+      - name: month_number
+        data_type: int
+        description: >
+          Calendar month from 1 through 12.
+        data_tests:
+          - not_null
+
+      - name: day_of_month
+        data_type: int
+        description: >
+          Day number within the calendar month.
+        data_tests:
+          - not_null
+
+      - name: iso_week_number
+        data_type: int
+        description: >
+          ISO 8601 week number.
+          ISO week-year may differ from calendar year
+          near year boundaries.
+        data_tests:
+          - not_null
+
+      - name: day_of_week_iso
+        data_type: int
+        description: >
+          Day of week using ISO numbering.
+          Monday = 1 and Sunday = 7.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5, 6, 7]
+                quote: false
+
+      - name: is_weekend
+        data_type: int
+        description: >
+          1 for Saturday or Sunday, otherwise 0.
+          Project calendar convention, not an
+          Egyptian public-holiday calendar.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: month_start_date
+        data_type: date
+        description: >
+          First calendar date of the month
+          containing full_date.
+        data_tests:
+          - not_null

@@ -1,0 +1,201 @@
+
+version: 2
+
+models:
+  - name: fact_support_tickets
+
+    description: >
+      Gold current-state support tickets fact table.
+
+      Grain: one row per ticket_id.
+
+      Contains ticket identity, stable customer
+      identifier, issue category, current ticket
+      status, timestamps, status indicators,
+      and elapsed resolution duration.
+
+      Ticket status indicators represent current
+      CRM states, not historical status transitions.
+
+      Resolution duration is elapsed time between
+      ticket creation and recorded resolution.
+      It does not represent active handling time
+      or SLA compliance.
+
+      Date keys use source calendar dates.
+      Source timezone has not been independently
+      verified.
+
+    columns:
+
+      - name: ticket_id
+        description: >
+          Unique CRM support ticket identifier.
+          Defines the grain of this fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ticket_number
+        description: >
+          Unique business-facing ticket number.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: crm_customer_id
+        description: >
+          Original CRM customer identifier
+          associated with the ticket.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+      - name: customer_id
+        description: >
+          Stable OLTP customer identifier,
+          resolved through the current customer
+          dimension.
+
+          Not an SCD Type 2 customer version key.
+        data_tests:
+          - not_null
+
+      - name: issue_category
+        description: >
+          CRM classification of the support issue.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - DELIVERY
+                  - PAYMENT
+                  - PRODUCT
+                  - RETURN
+                  - OTHER
+
+      - name: ticket_status
+        description: >
+          Current support ticket status
+          from the latest loaded CRM data.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - OPEN
+                  - IN_PROGRESS
+                  - RESOLVED
+                  - CLOSED
+
+      - name: created_at
+        description: >
+          Source timestamp when the ticket
+          was created.
+        data_tests:
+          - not_null
+
+      - name: created_date_key
+        description: >
+          Calendar date key derived from
+          created_at in YYYYMMDD integer format.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: resolved_at
+        description: >
+          Source recorded resolution timestamp.
+
+          NULL is valid for OPEN and IN_PROGRESS
+          tickets in the current source data.
+
+      - name: resolved_date_key
+        description: >
+          Nullable calendar date key derived
+          from resolved_at when available.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: updated_at
+        description: >
+          Last ticket update timestamp
+          supplied by CRM.
+        data_tests:
+          - not_null
+
+      - name: ticket_count
+        description: >
+          Additive measure equal to one
+          for every support ticket.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: open_status_count
+        description: >
+          Equals one when the current
+          ticket status is OPEN.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: in_progress_status_count
+        description: >
+          Equals one when the current status
+          is IN_PROGRESS.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: resolved_status_count
+        description: >
+          Equals one when the current status
+          is RESOLVED.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: closed_status_count
+        description: >
+          Equals one when the current status
+          is CLOSED.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: resolution_duration_seconds
+        description: >
+          Elapsed seconds between created_at
+          and resolved_at, calculated using
+          DATEDIFF_BIG.
+
+          NULL when no resolution timestamp
+          is available.
+
+          Not a measure of active handling
+          time or SLA compliance.

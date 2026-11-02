@@ -1,0 +1,29 @@
+
+version: 2
+
+snapshots:
+  - name: snap_customers_scd_lab
+
+    description: >
+      Isolated SCD Type 2 experiment.
+      Tracks attribute changes for a single test customer.
+      Not intended for production deployment.
+
+    relation: source('scd_lab', 'customer_source')
+
+    config:
+      schema: scd_lab_snapshots
+
+      unique_key: customer_id
+
+      strategy: check
+
+      check_cols:
+        - city
+        - customer_segment
+        - preferred_channel
+        - marketing_opt_in
+        - loyalty_tier
+        - has_loyalty_account
+
+      hard_deletes: ignore

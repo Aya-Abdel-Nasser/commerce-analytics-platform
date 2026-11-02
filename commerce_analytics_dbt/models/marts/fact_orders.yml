@@ -1,0 +1,189 @@
+
+version: 2
+
+models:
+  - name: fact_orders
+
+    description: >
+      Gold order-level fact table for commerce analytics.
+
+      Grain: one row per order_id.
+
+      Combines order attributes, aggregated order items,
+      and aggregated payment attempts.
+
+      Monetary measures are denominated in EGP.
+
+      Customer historical version attribution is not
+      performed for orders predating available snapshot
+      history.
+
+    columns:
+
+      - name: order_id
+        description: >
+          Unique OLTP order identifier.
+          Defines the grain of this fact table.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_number
+        description: >
+          Business-facing order reference.
+          A degenerate dimension identifier.
+        data_tests:
+          - not_null
+
+      - name: customer_id
+        description: >
+          Stable OLTP customer identifier.
+          Does not identify a historical customer version.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_customers_integrated')
+                field: customer_id
+
+      - name: order_date_key
+        description: >
+          Integer date key in YYYYMMDD format.
+          Derived from the stored order_date.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: order_date
+        description: >
+          Original order timestamp at datetime2 precision.
+          No timezone conversion is applied.
+        data_tests:
+          - not_null
+
+      - name: order_updated_at
+        description: >
+          Last order update timestamp from OLTP.
+
+      - name: order_status
+        description: >
+          Current order lifecycle status.
+          Values observed during source profiling.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - CREATED
+                  - PAID
+                  - SHIPPED
+                  - DELIVERED
+                  - CANCELLED
+
+      - name: sales_channel
+        description: >
+          Sales channel reported by the source.
+        data_tests:
+          - not_null
+
+      - name: order_count
+        description: >
+          Additive measure equal to 1 for every order.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+                quote: false
+
+      - name: order_item_count
+        description: >
+          Number of order item records associated
+          with the order.
+
+      - name: total_quantity
+        description: >
+          Total ordered item quantity.
+
+      - name: gross_item_amount_egp
+        description: >
+          Gross merchandise amount before item
+          discounts, in EGP.
+
+      - name: total_discount_amount_egp
+        description: >
+          Total item discounts in EGP.
+
+      - name: net_item_amount_egp
+        description: >
+          Net merchandise amount after item discounts.
+          Not automatically recognized revenue.
+
+      - name: payment_attempt_count
+        description: >
+          Total recorded payment attempts for the order.
+
+      - name: successful_payment_count
+        description: >
+          Number of successful payment attempts.
+
+      - name: failed_payment_count
+        description: >
+          Number of failed payment attempts.
+
+      - name: pending_payment_count
+        description: >
+          Number of pending payment attempts.
+
+      - name: successful_payment_amount_egp
+        description: >
+          Sum of amounts from successful payment
+          attempts, in EGP.
+          Not automatically recognized revenue.
+
+      - name: has_successful_payment
+        description: >
+          1 when the order has at least one
+          successful payment, otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: has_payment_retry
+        description: >
+          1 when multiple payment attempts exist,
+          otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: has_order_items
+        description: >
+          1 when a matching aggregated order-item
+          record exists, otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: has_payment_attempts
+        description: >
+          1 when a matching aggregated payment
+          record exists, otherwise 0.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

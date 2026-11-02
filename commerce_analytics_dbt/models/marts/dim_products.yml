@@ -1,0 +1,68 @@
+
+version: 2
+
+models:
+  - name: dim_products
+
+    description: >
+      Gold product dimension implementing SCD Type 1.
+
+      Grain: one row per product_id.
+
+      Contains the current product attributes from
+      the PostgreSQL OLTP source.
+
+      Product name, category, and catalog list price
+      reflect the latest loaded source state.
+
+      Historical transaction prices are stored in
+      order item facts, not in this dimension.
+
+    columns:
+
+      - name: product_id
+        description: >
+          Stable OLTP product identifier.
+          Defines the grain of this dimension.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_oltp_products')
+                field: product_id
+
+      - name: sku
+        description: >
+          Unique business-facing product identifier.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: >
+          Current product name.
+        data_tests:
+          - not_null
+
+      - name: category
+        description: >
+          Current product category.
+          Historical category changes are not preserved.
+        data_tests:
+          - not_null
+
+      - name: current_list_price_egp
+        description: >
+          Current catalog list price in EGP.
+          Not necessarily the historical transaction price.
+        data_tests:
+          - not_null
+
+      - name: product_created_at
+        description: >
+          Original product creation timestamp.
+
+      - name: product_updated_at
+        description: >
+          Last product update timestamp from OLTP.

@@ -1,0 +1,99 @@
+
+version: 2
+
+models:
+  - name: dim_loyalty_accounts
+
+    description: >
+      Gold current-state loyalty account dimension.
+
+      Grain: one row per loyalty_account_id.
+
+      Links CRM loyalty accounts to stable OLTP
+      customer identifiers through the current
+      version of dim_customers.
+
+      Implements SCD Type 1. Loyalty tier and points
+      balance reflect the latest loaded source state.
+
+      current_points_balance is a stock measure,
+      not an additive historical transaction measure.
+
+      Enrollment dates use source calendar dates.
+      The source timezone has not been independently
+      verified.
+
+    columns:
+
+      - name: loyalty_account_id
+        description: >
+          Unique loyalty account identifier.
+          Defines the grain of this dimension.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: crm_customer_id
+        description: >
+          CRM customer identifier associated
+          with the loyalty account.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm_customers')
+                field: crm_customer_id
+
+      - name: customer_id
+        description: >
+          Stable OLTP customer identifier derived
+          through the current customer dimension.
+
+          This is not an SCD Type 2 version key.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_customers_integrated')
+                field: customer_id
+
+      - name: loyalty_tier
+        description: >
+          Current loyalty program tier.
+          Historical tier changes are not preserved
+          within this dimension.
+        data_tests:
+          - not_null
+
+      - name: current_points_balance
+        description: >
+          Latest loaded points balance for
+          the loyalty account.
+
+          This balance must not be summed
+          across different reporting dates.
+        data_tests:
+          - not_null
+
+      - name: enrolled_at
+        description: >
+          Timestamp when the account enrolled
+          in the loyalty program.
+        data_tests:
+          - not_null
+
+      - name: enrollment_date_key
+        description: >
+          Calendar date key derived from enrolled_at
+          using YYYYMMDD format and the source date.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: account_updated_at
+        description: >
+          Last account update timestamp
+          from the CRM source.

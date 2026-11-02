@@ -1,0 +1,31 @@
+
+version: 2
+
+sources:
+  - name: scd_lab
+
+    description: >
+      Isolated development source for testing
+      customer SCD Type 2 behavior.
+      Not part of the production pipeline.
+
+    database: commerce_warehouse_dev
+    schema: scd_lab
+
+    tables:
+      - name: customer_source
+
+        description: >
+          A single test customer copied from the
+          validated customer SCD source.
+          Used for controlled attribute changes.
+
+        columns:
+          - name: customer_id
+            description: >
+              Stable unique customer identifier.
+
+          - name: customer_segment
+            description: >
+              Tracked attribute used to test
+              SCD Type 2 version creation.
