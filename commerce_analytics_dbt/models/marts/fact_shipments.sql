@@ -62,17 +62,11 @@ final as (
         s.source_updated_at,
 
         -- Date dimension keys
-        convert(
-            int,
-            convert(char(8), s.shipped_at, 112)
-        ) as shipped_date_key,
+        {{ date_to_key('s.shipped_at') }} as shipped_date_key,
 
         case
             when s.delivered_at is not null
-            then convert(
-                int,
-                convert(char(8), s.delivered_at, 112)
-            )
+            then {{ date_to_key('s.delivered_at') }}
             else null
         end as delivered_date_key,
 

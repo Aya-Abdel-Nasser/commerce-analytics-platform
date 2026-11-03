@@ -62,10 +62,7 @@ final as (
         -- Enrollment and update metadata
         a.enrolled_at,
 
-        convert(
-            int,
-            convert(char(8), a.enrolled_at, 112)
-        ) as enrollment_date_key,
+        {{ date_to_key('a.enrolled_at') }} as enrollment_date_key,
 
         a.updated_at as account_updated_at
 

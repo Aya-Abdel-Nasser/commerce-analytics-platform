@@ -69,20 +69,14 @@ final as (
         -- Creation timestamp and date key
         t.created_at,
 
-        convert(
-            int,
-            convert(char(8), t.created_at, 112)
-        ) as created_date_key,
+        {{ date_to_key('t.created_at') }} as created_date_key,
 
         -- Resolution timestamp and date key
         t.resolved_at,
 
         case
             when t.resolved_at is not null
-            then convert(
-                int,
-                convert(char(8), t.resolved_at, 112)
-            )
+            then {{ date_to_key('t.resolved_at') }}
             else null
         end as resolved_date_key,
 

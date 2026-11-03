@@ -64,10 +64,7 @@ date_attributes as (
 )
 
 select
-    cast(
-        convert(char(8), full_date, 112)
-        as int
-    ) as date_key,
+    {{ date_to_key('full_date') }} as date_key,
 
     full_date,
 
