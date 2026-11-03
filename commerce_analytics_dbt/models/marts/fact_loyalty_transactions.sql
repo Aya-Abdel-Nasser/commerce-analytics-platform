@@ -62,10 +62,7 @@ final as (
         t.transaction_type,
         t.occurred_at,
 
-        convert(
-            int,
-            convert(char(8), t.occurred_at, 112)
-        ) as transaction_date_key,
+        {{ date_to_key('t.occurred_at') }} as transaction_date_key,
 
         -- Additive transaction count
         1 as transaction_count,

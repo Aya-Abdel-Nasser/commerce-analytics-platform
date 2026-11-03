@@ -1,0 +1,32 @@
+
+version: 2
+
+macros:
+  - name: date_to_key
+    description: |
+      Converts a SQL Server date or datetime expression
+      into an integer date key in YYYYMMDD format.
+
+      The macro preserves the input calendar date
+      without timezone conversion.
+
+      NULL input returns NULL.
+
+      Intended for dimensional models that require
+      integer date keys compatible with dim_date.
+
+      Usage example:
+        Call date_to_key('order_date') inside a dbt
+        Jinja expression in a SQL model.
+
+    arguments:
+      - name: date_expression
+        type: string
+        description: |
+          A trusted SQL expression that evaluates
+          to a valid SQL Server date or datetime.
+
+          Examples:
+            order_date
+            s.shipped_at
+            t.created_at

@@ -50,10 +50,7 @@ final as (
         customer_id,
 
         -- Date dimension relationship
-        convert(
-            int,
-            convert(char(8), order_date, 112)
-        ) as order_date_key,
+        {{ date_to_key('order_date') }} as order_date_key,
 
         -- Preserve the full source timestamp
         order_date,

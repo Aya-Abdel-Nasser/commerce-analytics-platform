@@ -37,21 +37,15 @@ final as (
         channel,
         campaign_status,
 
+
+
         -- Campaign start
         starts_at,
-
-        convert(
-            int,
-            convert(char(8), starts_at, 112)
-        ) as start_date_key,
+        {{ date_to_key('starts_at') }} as start_date_key,
 
         -- Campaign end
         ends_at,
-
-        convert(
-            int,
-            convert(char(8), ends_at, 112)
-        ) as end_date_key,
+        {{ date_to_key('ends_at') }} as end_date_key,
 
         -- Source update metadata
         updated_at as campaign_updated_at

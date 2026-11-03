@@ -66,10 +66,7 @@ final as (
         -- Targeting timestamp
         m.targeted_at,
 
-        convert(
-            int,
-            convert(char(8), m.targeted_at, 112)
-        ) as targeted_date_key,
+        {{ date_to_key('m.targeted_at') }} as targeted_date_key,
 
         -- Source engagement timestamp
         -- NULL is valid for TARGETED status
@@ -77,10 +74,7 @@ final as (
 
         case
             when m.engaged_at is not null
-            then convert(
-                int,
-                convert(char(8), m.engaged_at, 112)
-            )
+            then {{ date_to_key('m.engaged_at') }}
             else null
         end as engaged_date_key,
 
