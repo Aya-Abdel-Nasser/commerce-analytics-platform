@@ -9,7 +9,7 @@ sources:
       customer SCD Type 2 behavior.
       Not part of the production pipeline.
 
-    database: commerce_warehouse_dev
+    database: "{{ target.database }}"
     schema: scd_lab
 
     tables:
