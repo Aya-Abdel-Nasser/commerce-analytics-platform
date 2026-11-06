@@ -241,9 +241,10 @@ jobs:
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
 
-          python -m pip install \
+            python -m pip install \
             "dbt-core==1.12.6" \
-            "dbt-sqlserver==1.12.1"
+            "dbt-sqlserver==1.12.1" \
+            "pyodbc"
 
           dbt deps --project-dir commerce_analytics_dbt
 
