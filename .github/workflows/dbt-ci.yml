@@ -193,3 +193,38 @@ jobs:
             "
 
           echo "CI Bronze schema verification passed."
+
+      - name: Set up Python for test data
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate integration test data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python src/generate_oltp.py \
+            --profile prodlike \
+            --mode initial \
+            --seed 20261008
+
+          python src/generate_crm.py \
+            --profile prodlike \
+            --seed 20261008
+
+          echo "Integration test data generated."
+
+      - name: Install CI data loader dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python -m pip install "pymssql==2.4.6"
+
+      - name: Load customer Bronze data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python infra/ci/load_customer_bronze.py
