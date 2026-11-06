@@ -1,11 +1,7 @@
-
 name: dbt Static CI
 
 on:
   pull_request:
-    paths:
-      - 'commerce_analytics_dbt/**'
-      - '.github/workflows/dbt-ci.yml'
 
   workflow_dispatch:
 
@@ -28,12 +24,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dbt dependencies
         run: |
           python -m pip install "dbt-core==1.12.6" "dbt-sqlserver==1.12.1"
-
 
       - name: Create isolated CI profile
         run: |
@@ -68,3 +63,133 @@ jobs:
       - name: Parse dbt project
         run: |
           dbt parse --project-dir commerce_analytics_dbt --profiles-dir "$env:CI_PROFILE_DIR" --target ci --no-partial-parse
+
+  dbt-integration:
+    name: dbt Integration Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Start isolated SQL Server
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MSSQL_SA_PASSWORD="$(openssl rand -hex 24)Aa1!"
+          echo "::add-mask::$MSSQL_SA_PASSWORD"
+          echo "MSSQL_SA_PASSWORD=$MSSQL_SA_PASSWORD" >> "$GITHUB_ENV"
+
+          docker run -d \
+            --name ci-sqlserver \
+            --memory 4g \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$MSSQL_SA_PASSWORD" \
+            -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+
+          echo "SQL Server container started."
+
+      - name: Wait for SQL Server readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for attempt in {1..30}; do
+            if docker exec ci-sqlserver \
+              /opt/mssql-tools18/bin/sqlcmd \
+              -S localhost \
+              -U sa \
+              -P "$MSSQL_SA_PASSWORD" \
+              -C \
+              -Q "SELECT 1" > /dev/null 2>&1; then
+
+              echo "SQL Server is ready."
+              exit 0
+            fi
+
+            echo "Waiting for SQL Server... attempt $attempt/30"
+            sleep 5
+          done
+
+          echo "::error::SQL Server did not become ready."
+
+          docker logs --tail 80 ci-sqlserver
+          exit 1
+
+      - name: Create isolated CI database
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker exec ci-sqlserver \
+            /opt/mssql-tools18/bin/sqlcmd \
+            -S localhost \
+            -U sa \
+            -P "$MSSQL_SA_PASSWORD" \
+            -C \
+            -b \
+            -Q "CREATE DATABASE commerce_warehouse_ci;"
+
+          echo "CI database created."
+
+      - name: Create CI Bronze tables
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker cp \
+            infra/ci/bootstrap_customer_bronze.sql \
+            ci-sqlserver:/tmp/bootstrap_customer_bronze.sql
+
+          docker exec ci-sqlserver \
+            /opt/mssql-tools18/bin/sqlcmd \
+            -S localhost \
+            -U sa \
+            -P "$MSSQL_SA_PASSWORD" \
+            -C \
+            -b \
+            -i /tmp/bootstrap_customer_bronze.sql
+
+          echo "CI Bronze tables created."
+
+      - name: Verify CI Bronze schema
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker exec ci-sqlserver \
+            /opt/mssql-tools18/bin/sqlcmd \
+            -S localhost \
+            -U sa \
+            -P "$MSSQL_SA_PASSWORD" \
+            -C \
+            -b \
+            -d commerce_warehouse_ci \
+            -Q "
+              SET NOCOUNT ON;
+
+              DECLARE @table_count INT;
+
+              SELECT @table_count = COUNT(*)
+              FROM sys.tables AS t
+              INNER JOIN sys.schemas AS s
+                  ON t.schema_id = s.schema_id
+              WHERE s.name = 'bronze'
+                AND t.name IN (
+                    'oltp_customers',
+                    'crm_customers',
+                    'crm_loyalty_accounts',
+                    'crm_loyalty_transactions'
+                );
+
+              SELECT @table_count AS verified_tables;
+
+              IF @table_count <> 4
+                  THROW 50001, 'CI Bronze schema verification failed.', 1;
+            "
+
+          echo "CI Bronze schema verification passed."
