@@ -1,0 +1,33 @@
+﻿{
+    "test_name":  "SCD2 Historical Value Preservation",
+    "test_date":  "2026-11-06",
+    "environment":  "TEST",
+    "source":  {
+                   "table":  "crm_customers_backup_before_batch_20261105",
+                   "database":  "commerce_crm_test",
+                   "exported_rows":  50000,
+                   "system":  "MySQL"
+               },
+    "target":  {
+                   "historical_filter":  "dbt_valid_to IS NOT NULL",
+                   "table":  "dbt_test_snapshots.snap_customers",
+                   "database":  "commerce_warehouse_test",
+                   "system":  "SQL Server",
+                   "historical_rows":  8500
+               },
+    "comparison":  {
+                       "join_key":  "customer_code",
+                       "missing_customers":  0,
+                       "duplicate_historical_keys":  0,
+                       "marketing_mismatches":  0,
+                       "channel_mismatches":  0,
+                       "segment_mismatches":  0,
+                       "compared_columns":  [
+                                                "customer_segment",
+                                                "preferred_channel",
+                                                "marketing_opt_in"
+                                            ],
+                       "duplicate_backup_keys":  0
+                   },
+    "status":  "PASS"
+}
