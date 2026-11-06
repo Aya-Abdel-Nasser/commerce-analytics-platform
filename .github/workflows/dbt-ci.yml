@@ -2,7 +2,6 @@ name: dbt Static CI
 
 on:
   pull_request:
-
   workflow_dispatch:
 
 permissions:
@@ -62,7 +61,11 @@ jobs:
 
       - name: Parse dbt project
         run: |
-          dbt parse --project-dir commerce_analytics_dbt --profiles-dir "$env:CI_PROFILE_DIR" --target ci --no-partial-parse
+          dbt parse `
+            --project-dir commerce_analytics_dbt `
+            --profiles-dir "$env:CI_PROFILE_DIR" `
+            --target ci `
+            --no-partial-parse
 
   dbt-integration:
     name: dbt Integration Tests
@@ -116,7 +119,6 @@ jobs:
           done
 
           echo "::error::SQL Server did not become ready."
-
           docker logs --tail 80 ci-sqlserver
           exit 1
 
@@ -241,7 +243,7 @@ jobs:
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
 
-            python -m pip install \
+          python -m pip install \
             "dbt-core==1.12.6" \
             "dbt-sqlserver==1.12.1" \
             "pyodbc"
@@ -293,4 +295,5 @@ jobs:
             --project-dir commerce_analytics_dbt \
             --target ci \
             --select "+dim_customers" \
+            --indirect-selection cautious \
             --fail-fast
