@@ -297,3 +297,150 @@ jobs:
             --select "+dim_customers" \
             --indirect-selection cautious \
             --fail-fast
+
+      - name: Apply controlled customer changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker exec ci-sqlserver \
+            /opt/mssql-tools18/bin/sqlcmd \
+            -S localhost \
+            -U sa \
+            -P "$MSSQL_SA_PASSWORD" \
+            -C \
+            -b \
+            -d commerce_warehouse_ci \
+            -Q "
+              SET NOCOUNT ON;
+              SET XACT_ABORT ON;
+
+              BEGIN TRANSACTION;
+
+              IF (
+                  SELECT COUNT(*)
+                  FROM dbt_ci_snapshots.snap_customers
+              ) <> 50000
+                  THROW 50001, 'Initial snapshot count is not 50000.', 1;
+
+              IF (
+                  SELECT COUNT(*)
+                  FROM dbt_ci_snapshots.snap_customers
+                  WHERE dbt_valid_to IS NULL
+              ) <> 50000
+                  THROW 50002, 'Initial current-version count is not 50000.', 1;
+
+              ;WITH selected_customers AS (
+                  SELECT TOP (8500)
+                      c.crm_customer_id
+                  FROM bronze.crm_customers AS c
+                  INNER JOIN bronze.oltp_customers AS o
+                      ON o.customer_code = c.external_customer_code
+                  ORDER BY o.customer_id
+              )
+              UPDATE c
+              SET customer_segment =
+                  CASE
+                      WHEN c.customer_segment = 'VIP'
+                          THEN 'ACTIVE'
+                      ELSE 'VIP'
+                  END
+              FROM bronze.crm_customers AS c
+              INNER JOIN selected_customers AS s
+                  ON c.crm_customer_id = s.crm_customer_id;
+
+              DECLARE @changed_rows INT = @@ROWCOUNT;
+
+              IF @changed_rows <> 8500
+                  THROW 50003, 'Expected exactly 8500 changed customers.', 1;
+
+              COMMIT TRANSACTION;
+
+              SELECT @changed_rows AS changed_customers;
+            "
+      - name: Capture customer historical changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          dbt snapshot \
+            --project-dir commerce_analytics_dbt \
+            --target ci \
+            --select snap_customers
+
+      - name: Verify customer SCD Type 2 history
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker exec ci-sqlserver \
+            /opt/mssql-tools18/bin/sqlcmd \
+            -S localhost \
+            -U sa \
+            -P "$MSSQL_SA_PASSWORD" \
+            -C \
+            -b \
+            -d commerce_warehouse_ci \
+            -Q "
+              SET NOCOUNT ON;
+
+              DECLARE @total_rows INT;
+              DECLARE @distinct_customers INT;
+              DECLARE @current_versions INT;
+              DECLARE @historical_versions INT;
+              DECLARE @changed_customers INT;
+
+              SELECT
+                  @total_rows = COUNT(*),
+                  @distinct_customers = COUNT(DISTINCT customer_id),
+                  @current_versions =
+                      SUM(CASE WHEN dbt_valid_to IS NULL THEN 1 ELSE 0 END),
+                  @historical_versions =
+                      SUM(CASE WHEN dbt_valid_to IS NOT NULL THEN 1 ELSE 0 END)
+              FROM dbt_ci_snapshots.snap_customers;
+
+              SELECT @changed_customers = COUNT(*)
+              FROM (
+                  SELECT customer_id
+                  FROM dbt_ci_snapshots.snap_customers
+                  GROUP BY customer_id
+                  HAVING COUNT(*) = 2
+                     AND COUNT(DISTINCT customer_segment) = 2
+              ) AS changed;
+
+              SELECT
+                  @total_rows AS total_rows,
+                  @distinct_customers AS distinct_customers,
+                  @current_versions AS current_versions,
+                  @historical_versions AS historical_versions,
+                  @changed_customers AS changed_customers;
+
+              IF @total_rows <> 58500
+                  THROW 50010, 'Unexpected snapshot total rows.', 1;
+
+              IF @distinct_customers <> 50000
+                  THROW 50011, 'Unexpected distinct customer count.', 1;
+
+              IF @current_versions <> 50000
+                  THROW 50012, 'Unexpected current version count.', 1;
+
+              IF @historical_versions <> 8500
+                  THROW 50013, 'Unexpected historical version count.', 1;
+
+              IF @changed_customers <> 8500
+                  THROW 50014, 'Historical segment changes verification failed.', 1;
+
+              PRINT 'CUSTOMER SCD TYPE 2 VALIDATION: PASS';
+            "
+
+      - name: Rebuild customer dimension after SCD changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          dbt build \
+            --project-dir commerce_analytics_dbt \
+            --target ci \
+            --select dim_customers \
+            --indirect-selection cautious \
+            --fail-fast
