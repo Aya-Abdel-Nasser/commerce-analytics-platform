@@ -283,3 +283,14 @@ jobs:
           dbt debug \
             --project-dir commerce_analytics_dbt \
             --target ci
+
+      - name: Build and test customer models
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          dbt build \
+            --project-dir commerce_analytics_dbt \
+            --target ci \
+            --select "+dim_customers" \
+            --fail-fast
