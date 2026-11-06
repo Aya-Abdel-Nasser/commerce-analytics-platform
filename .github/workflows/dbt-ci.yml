@@ -228,3 +228,57 @@ jobs:
           set -euo pipefail
 
           python infra/ci/load_customer_bronze.py
+
+      - name: Install SQL Server ODBC driver and dbt
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -fsSLo /tmp/packages-microsoft-prod.deb \
+            https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb
+
+          sudo dpkg -i /tmp/packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+
+          python -m pip install \
+            "dbt-core==1.12.6" \
+            "dbt-sqlserver==1.12.1"
+
+          dbt deps --project-dir commerce_analytics_dbt
+
+      - name: Create isolated dbt CI profile
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$RUNNER_TEMP/dbt-profile"
+
+          cat > "$RUNNER_TEMP/dbt-profile/profiles.yml" <<'EOF'
+          commerce_analytics_dbt:
+            target: ci
+            outputs:
+              ci:
+                type: sqlserver
+                driver: "ODBC Driver 18 for SQL Server"
+                host: 127.0.0.1
+                port: 1433
+                database: commerce_warehouse_ci
+                schema: dbt_ci
+                user: sa
+                password: "{{ env_var('MSSQL_SA_PASSWORD') }}"
+                encrypt: true
+                trust_cert: true
+                threads: 2
+          EOF
+
+          echo "DBT_PROFILES_DIR=$RUNNER_TEMP/dbt-profile" >> "$GITHUB_ENV"
+
+      - name: Verify dbt CI connection
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          dbt debug \
+            --project-dir commerce_analytics_dbt \
+            --target ci
